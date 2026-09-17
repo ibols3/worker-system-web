@@ -1,2253 +1,375 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Worker System</title>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
-
-  <style>
-
-    :root {
-      --blue-dark: #0b5394;
-      --blue: #3d85c6;
-      --bg: #f4f7fb;
-      --white: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #dbe3ec;
-
-      --red: #ff0000;
-      --red-soft: #f4cccc;
-
-      --orange: #ff9900;
-      --orange-soft: #fce5cd;
-
-      --yellow: #ffff00;
-      --yellow-soft: #fff2cc;
-
-      --cyan: #00ffff;
-      --cyan-soft: #cfe2f3;
-
-      --green: #00ff00;
-      --green-soft: #d9ead3;
-
-      --danger: #c00000;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: "Inter", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    button,
-    input,
-    select {
-      font-family: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    /* =========================================
-       SIDEBAR
-    ========================================= */
-
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-
-      width: 245px;
-      height: 100vh;
-
-      background: var(--blue-dark);
-      color: white;
-
-      padding: 26px 16px;
-
-      z-index: 1000;
-    }
-
-    .brand {
-      padding: 0 12px 28px;
-    }
-
-    .brand-title {
-      font-family: "Oswald", sans-serif;
-      font-size: 27px;
-      font-weight: 600;
-      letter-spacing: 0.8px;
-    }
-
-    .brand-subtitle {
-      margin-top: 4px;
-      font-size: 11px;
-      letter-spacing: 1.4px;
-      opacity: .7;
-      text-transform: uppercase;
-    }
-
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .menu-button {
-      width: 100%;
-
-      border: none;
-      background: transparent;
-
-      color: white;
-
-      padding: 13px 14px;
-
-      border-radius: 11px;
-
-      text-align: left;
-
-      font-size: 14px;
-      font-weight: 700;
-
-      transition: .2s ease;
-    }
-
-    .menu-button:hover {
-      background: rgba(255,255,255,.12);
-    }
-
-    .menu-button.active {
-      background: white;
-      color: var(--blue-dark);
-    }
-
-    /* =========================================
-       MAIN
-    ========================================= */
-
-    .main {
-      margin-left: 245px;
-      min-height: 100vh;
-      padding: 30px 34px;
-    }
-
-    /* =========================================
-       PAGE HEADER
-    ========================================= */
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      margin-bottom: 28px;
-    }
-
-    .page-title h1 {
-      font-family: "Oswald", sans-serif;
-      font-size: 34px;
-      font-weight: 600;
-      color: var(--blue-dark);
-      letter-spacing: .4px;
-    }
-
-    .page-title p {
-      margin-top: 4px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .date-box {
-      background: white;
-
-      border: 1px solid var(--border);
-      border-radius: 11px;
-
-      padding: 12px 17px;
-
-      font-size: 13px;
-      font-weight: 700;
-
-      box-shadow: 0 4px 12px rgba(0,0,0,.04);
-    }
-
-    /* =========================================
-       PAGE SYSTEM
-    ========================================= */
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    /* =========================================
-       DASHBOARD
-    ========================================= */
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-bottom: 28px;
-    }
-
-    .stat-card {
-      background: white;
-      border-radius: 17px;
-      padding: 21px;
-
-      border: 1px solid #e4eaf1;
-
-      box-shadow: 0 5px 18px rgba(0,0,0,.05);
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .3px;
-    }
-
-    .stat-value {
-      margin-top: 9px;
-
-      font-family: "Oswald", sans-serif;
-      font-size: 38px;
-      font-weight: 600;
-
-      color: var(--blue-dark);
-    }
-
-    .section-title {
-      margin: 26px 0 14px;
-
-      font-family: "Oswald", sans-serif;
-      font-size: 21px;
-      font-weight: 600;
-      color: #111827;
-    }
-
-    .teams {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-    }
-
-    .team-card {
-      background: white;
-      border-radius: 15px;
-      overflow: hidden;
-
-      border: 1px solid #e4eaf1;
-
-      box-shadow: 0 4px 15px rgba(0,0,0,.05);
-    }
-
-    .team-header {
-      text-align: center;
-      padding: 11px 12px;
-
-      font-family: "Oswald", sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .team-body {
-      text-align: center;
-      padding: 17px;
-    }
-
-    .team-number {
-      font-family: "Oswald", sans-serif;
-      font-size: 31px;
-      font-weight: 600;
-    }
-
-    .team-label {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .team-red .team-header {
-      background: var(--red);
-    }
-
-    .team-orange .team-header {
-      background: var(--orange);
-    }
-
-    .team-yellow .team-header {
-      background: var(--yellow);
-    }
-
-    .team-blue .team-header {
-      background: var(--cyan);
-    }
-
-    .team-green .team-header {
-      background: var(--green);
-    }
-
-    .quick-actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .action-card {
-      border: 1px solid #e4eaf1;
-      background: white;
-
-      border-radius: 15px;
-      padding: 20px;
-
-      text-align: left;
-
-      transition: .2s ease;
-    }
-
-    .action-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,.08);
-    }
-
-    .action-card h3 {
-      font-family: "Oswald", sans-serif;
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--blue-dark);
-      margin-bottom: 7px;
-    }
-
-    .action-card p {
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--muted);
-    }
-
-    /* =========================================
-       MASTER DATA
-    ========================================= */
-
-    .toolbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-      flex-wrap: wrap;
-
-      margin-bottom: 18px;
-    }
-
-    .toolbar-left,
-    .toolbar-right {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .search-box {
-      min-width: 280px;
-
-      background: white;
-      border: 1px solid var(--border);
-
-      border-radius: 11px;
-
-      padding: 12px 14px;
-
-      outline: none;
-
-      font-size: 13px;
-    }
-
-    .search-box:focus {
-      border-color: var(--blue);
-    }
-
-    .filter-select {
-      background: white;
-      border: 1px solid var(--border);
-
-      border-radius: 11px;
-
-      padding: 12px 14px;
-
-      font-size: 13px;
-
-      outline: none;
-    }
-
-    .primary-button {
-      border: none;
-
-      background: var(--blue-dark);
-      color: white;
-
-      border-radius: 11px;
-
-      padding: 12px 18px;
-
-      font-size: 13px;
-      font-weight: 800;
-
-      transition: .2s ease;
-    }
-
-    .primary-button:hover {
-      background: #084477;
-    }
-
-    .data-card {
-      background: white;
-
-      border: 1px solid #e1e8f0;
-
-      border-radius: 16px;
-
-      overflow: hidden;
-
-      box-shadow: 0 5px 18px rgba(0,0,0,.05);
-    }
-
-    .table-wrap {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 750px;
-    }
-
-    thead {
-      background: var(--blue-dark);
-      color: white;
-    }
-
-    th {
-      padding: 14px 15px;
-      text-align: left;
-
-      font-family: "Oswald", sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: .3px;
-    }
-
-    td {
-      padding: 13px 15px;
-
-      border-bottom: 1px solid #edf1f5;
-
-      font-size: 13px;
-    }
-
-    tbody tr:hover {
-      background: #f8fbff;
-    }
-
-    .worker-name {
-      font-weight: 700;
-    }
-
-    .worker-id {
-      font-weight: 700;
-      color: #475569;
-    }
-
-    .inactive-row td {
-      color: #9099a6;
-      text-decoration: line-through;
-    }
-
-    .inactive-row .team-badge,
-    .inactive-row .status-badge {
-      text-decoration: none;
-      opacity: .6;
-    }
-
-    /* =========================================
-       TEAM BADGE
-    ========================================= */
-
-    .team-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-
-      min-width: 78px;
-
-      border-radius: 7px;
-
-      padding: 6px 9px;
-
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .badge-red {
-      background: var(--red-soft);
-      color: #8f0000;
-    }
-
-    .badge-orange {
-      background: var(--orange-soft);
-      color: #9a5600;
-    }
-
-    .badge-yellow {
-      background: var(--yellow-soft);
-      color: #8a7800;
-    }
-
-    .badge-blue {
-      background: var(--cyan-soft);
-      color: #075879;
-    }
-
-    .badge-green {
-      background: var(--green-soft);
-      color: #2b6e31;
-    }
-
-    /* =========================================
-       STATUS BADGE
-    ========================================= */
-
-    .status-badge {
-      display: inline-flex;
-
-      align-items: center;
-      justify-content: center;
-
-      min-width: 82px;
-
-      padding: 6px 10px;
-
-      border-radius: 20px;
-
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .status-active {
-      background: #d9ead3;
-      color: #2b6e31;
-    }
-
-    .status-inactive {
-      background: #eeeeee;
-      color: #777777;
-    }
-
-    .action-small {
-      border: 1px solid #d8e1eb;
-      background: white;
-
-      padding: 7px 11px;
-
-      border-radius: 8px;
-
-      font-size: 11px;
-      font-weight: 800;
-
-      color: var(--blue-dark);
-    }
-
-    .action-small:hover {
-      background: #f1f7ff;
-    }
-
-    /* =========================================
-       MODAL
-    ========================================= */
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-
-      background: rgba(11, 83, 148, .30);
-
-      display: none;
-      align-items: center;
-      justify-content: center;
-
-      z-index: 3000;
-
-      padding: 20px;
-    }
-
-    .modal-backdrop.show {
-      display: flex;
-    }
-
-    .modal {
-      width: 100%;
-      max-width: 500px;
-
-      background: white;
-
-      border-radius: 18px;
-
-      box-shadow: 0 20px 50px rgba(0,0,0,.18);
-
-      overflow: hidden;
-    }
-
-    .modal-header {
-      background: var(--blue-dark);
-      color: white;
-
-      padding: 18px 20px;
-
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-header h2 {
-      font-family: "Oswald", sans-serif;
-      font-size: 22px;
-      font-weight: 500;
-    }
-
-    .modal-close {
-      border: none;
-      background: transparent;
-      color: white;
-
-      font-size: 23px;
-      cursor: pointer;
-    }
-
-    .modal-body {
-      padding: 22px;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-label {
-      display: block;
-
-      margin-bottom: 7px;
-
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .form-input,
-    .form-select {
-      width: 100%;
-
-      border: 1px solid var(--border);
-
-      border-radius: 10px;
-
-      padding: 11px 12px;
-
-      outline: none;
-
-      font-size: 13px;
-    }
-
-    .form-input:focus,
-    .form-select:focus {
-      border-color: var(--blue);
-    }
-
-    .modal-footer {
-      padding: 15px 22px;
-
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-
-      border-top: 1px solid #edf1f5;
-    }
-
-    .secondary-button {
-      border: 1px solid #d7e0ea;
-
-      background: white;
-
-      padding: 11px 17px;
-
-      border-radius: 10px;
-
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    /* =========================================
-       EMPTY
-    ========================================= */
-
-    .empty {
-      padding: 50px 20px;
-      text-align: center;
-
-      color: var(--muted);
-
-      font-size: 14px;
-    }
-
-    /* =========================================
-       RESPONSIVE
-    ========================================= */
-
-    @media (max-width: 1100px) {
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .teams {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .quick-actions {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-    }
-
-    @media (max-width: 760px) {
-
-      .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-      }
-
-      .main {
-        margin-left: 0;
-        padding: 20px;
-      }
-
-      .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .stats,
-      .teams,
-      .quick-actions {
-        grid-template-columns: 1fr;
-      }
-
-      .search-box {
-        min-width: 100%;
-      }
-
-    }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worker System — Dummy Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--nav:#0b5394;--nav2:#3d85c6;--bg:#f4f7fb;--muted:#6b7280;--border:#dbe3ec;--red:#ff0000;--orange:#ff9900;--yellow:#ffff00;--cyan:#00ffff;--green:#00ff00;--danger:#a61c00}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:#1f2937;font-family:Inter,Arial,sans-serif}
+.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:var(--nav);color:#fff;padding:24px 14px;overflow:auto}.brand{font:600 27px Oswald;margin:0 12px 28px}.brand small{display:block;font:400 11px Inter;opacity:.72;letter-spacing:1px;margin-top:3px}.menu{display:grid;gap:6px}.menu button{border:0;background:transparent;color:#fff;text-align:left;padding:13px 14px;border-radius:10px;font-weight:700;cursor:pointer}.menu button:hover{background:#ffffff1c}.menu button.active{background:#fff;color:var(--nav)}
+.main{margin-left:245px;padding:30px;min-height:100vh}.page{display:none}.page.active{display:block}.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}.title h1{font:600 34px Oswald;color:var(--nav);margin:0}.title p{color:var(--muted);font-size:13px;margin:4px 0 0}.box,.stat,.card{background:#fff;border:1px solid var(--border);border-radius:15px;box-shadow:0 4px 14px #00000008}.panel{padding:18px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.stat{padding:20px}.stat span{display:block;color:var(--muted);font-size:12px;font-weight:700}.stat strong{display:block;color:var(--nav);font:600 38px Oswald;margin-top:7px}.section{font:600 21px Oswald;margin:28px 0 14px}.teams{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.team{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--border)}.team h3{font:600 16px Oswald;text-align:center;margin:0;padding:11px}.team p{text-align:center;font:600 30px Oswald;margin:17px}.red h3{background:var(--red)}.orange h3{background:var(--orange)}.yellow h3{background:var(--yellow)}.blue h3{background:var(--cyan)}.green h3{background:var(--green)}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.actions button{border:0;text-align:left;background:#fff;padding:20px;border-radius:15px;box-shadow:0 4px 14px #00000008;cursor:pointer}.actions h3{font:600 20px Oswald;color:var(--nav);margin:0 0 6px}.actions p{margin:0;color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.input,.select,.btn{padding:11px 13px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:13px}.btn{background:var(--nav);color:#fff;border:0;font-weight:800;cursor:pointer}.btn.secondary{background:#fff;color:var(--nav);border:1px solid #a9bfd4}.btn.danger{background:#b71c1c}.btn.success{background:#2e7d32}.table{overflow:auto}.table table{width:100%;border-collapse:collapse;min-width:860px}.table th{background:var(--nav);color:#fff;padding:12px;text-align:left;font:500 14px Oswald;white-space:nowrap}.table td{background:#fff;border-bottom:1px solid #edf1f5;padding:12px;font-size:13px}.row-inactive td{text-decoration:line-through;color:#8d96a2}.badge{display:inline-block;padding:6px 9px;border-radius:8px;font-size:11px;font-weight:800}.b-red{background:#f4cccc}.b-orange{background:#fce5cd}.b-yellow{background:#fff2cc}.b-blue{background:#cfe2f3}.b-green{background:#d9ead3}.status{padding:5px 9px;border-radius:20px;font-size:11px;font-weight:800}.status.active{background:#d9ead3;color:#2b6e31}.status.inactive{background:#eee;color:#777}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ok{padding:14px;border-radius:10px;background:#f3fbf3;border:1px solid #bfe0bf;color:#2b6e31}.conf{padding:14px;border-radius:10px;background:#fff4f4;border:1px solid #f1b9b9;color:#8a1c1c}.info{padding:14px;border-radius:10px;background:#eef6ff;border:1px solid #c8ddf2;color:#194f7a}.muted{color:var(--muted);font-size:12px}
+.modal{position:fixed;inset:0;background:#0005;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}.dialog{background:#fff;width:100%;max-width:520px;border-radius:16px;overflow:hidden}.dialog h2{margin:0;background:var(--nav);color:#fff;padding:18px;font:500 22px Oswald}.dialog .body{padding:20px}.dialog label{display:block;font-size:12px;font-weight:800;margin:0 0 6px}.dialog input,.dialog select{width:100%;padding:11px;border:1px solid var(--border);border-radius:9px;margin:0 0 14px}.dialog .foot{padding:15px 20px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #edf1f5}
+.request{display:grid;grid-template-columns:1.05fr .8fr .65fr 1.1fr 1.15fr auto;gap:8px;margin-bottom:8px;align-items:center}.request .select,.request .input{width:100%}.iconbtn{padding:10px 12px;border:1px solid var(--border);background:#fff;border-radius:9px;cursor:pointer}
+.section-title{font:600 18px Oswald;color:var(--nav);margin:0 0 12px}.request-chip{border:1px solid var(--border);border-radius:12px;padding:12px;background:#fbfdff}.request-chip h4{margin:0 0 4px;font:500 17px Oswald;color:var(--nav)}.request-chip .sub{font-size:11px;color:var(--muted)}
+.callsheet-head{background:#fff;border:1px solid var(--border);border-radius:15px;padding:18px;margin-bottom:16px}.callsheet-title{font:600 34px Oswald;color:var(--nav);margin:0}.callsheet-meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:13px}.callsheet-meta b{color:var(--nav)}
+.call-section{background:#fff;border:1px solid #0b5394;border-radius:14px;overflow:hidden;margin-bottom:16px}.call-head{background:#0b5394;color:#fff;padding:11px 14px;font:600 19px Oswald;display:flex;justify-content:space-between;align-items:center}.call-body{padding:12px}.worker-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.worker-row{display:grid;grid-template-columns:52px 1fr 90px;min-height:44px;border:1px solid #dbe3ec;border-radius:9px;overflow:hidden;align-items:stretch}.worker-no{display:flex;align-items:center;justify-content:center;font:700 20px Oswald;color:#111}.worker-name{display:flex;align-items:center;padding:0 10px;font:600 16px Oswald;background:#f5f7fa}.worker-team{display:flex;align-items:center;justify-content:center;font:700 11px Inter}
+.team-red .worker-no{background:#ff0000}.team-red .worker-name{background:#f4cccc}.team-red .worker-team{background:#f4cccc}.team-orange .worker-no{background:#ff9900}.team-orange .worker-name{background:#fce5cd}.team-orange .worker-team{background:#fce5cd}.team-yellow .worker-no{background:#ffff00}.team-yellow .worker-name{background:#fff2cc}.team-yellow .worker-team{background:#fff2cc}.team-blue .worker-no{background:#00ffff}.team-blue .worker-name{background:#cfe2f3}.team-blue .worker-team{background:#cfe2f3}.team-green .worker-no{background:#00ff00}.team-green .worker-name{background:#d9ead3}.team-green .worker-team{background:#d9ead3}
+.move-select{border:0;background:transparent;font:600 11px Inter;max-width:88px}.off-grid{display:flex;flex-wrap:wrap;gap:8px}.off-card{border:1px solid #dbe3ec;border-radius:9px;padding:8px 11px;background:#fff;font:600 14px Oswald}.off-card small{display:block;font:400 10px Inter;color:var(--muted);margin-top:2px}.mini{padding:6px 9px;border-radius:8px;background:#f4f7fb;border:1px solid var(--border);font-size:11px}
+.schedule-wrap{overflow:auto;border-radius:14px}.schedule-table{border-collapse:collapse;min-width:1100px;width:100%}.schedule-table th,.schedule-table td{border:1px solid #dbe3ec;padding:9px 10px;font-size:12px;text-align:center}.schedule-table th{background:#0b5394;color:#fff;font:500 13px Oswald;position:sticky;top:0}.schedule-table th.left,.schedule-table td.left{text-align:left}.schedule-table td.name{text-align:left;font-weight:700}.schedule-table .inactive-row td{text-decoration:line-through;color:#8d96a2}.work-cell{font-weight:800;color:#2b6e31}.off-cell{font-weight:800;color:#8a1c1c}.low-work{font-weight:800;color:#b71c1c;font-style:italic}.conflict-table{width:100%;border-collapse:collapse}.conflict-table th,.conflict-table td{padding:10px;border-bottom:1px solid #edf1f5;text-align:left;font-size:12px}.conflict-table th{background:#0b5394;color:#fff;font:500 13px Oswald}.list{margin:7px 0 0 18px;padding:0}.footer-note{margin-top:14px;font-size:11px;color:var(--muted)}
+@media print{.sidebar,.topbar:not(.callsheet-only),.screen-only{display:none!important}.main{margin:0;padding:12px}.page{display:none!important}.page.print-callsheet{display:block!important}.box{box-shadow:none}.callsheet-head,.call-section{break-inside:avoid}}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.teams{grid-template-columns:repeat(3,1fr)}.actions{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.worker-grid{grid-template-columns:1fr}}
+@media(max-width:720px){.sidebar{position:relative;width:auto;height:auto}.main{margin:0;padding:20px}.stats,.teams,.actions{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}.request{grid-template-columns:1fr 1fr}.worker-row{grid-template-columns:45px 1fr 70px}.callsheet-title{font-size:27px}}
+
+
+/* --- Callsheet redesign V3: one-column / five-row production layout --- */
+.callsheet-shell{background:#fff;border:1.5px solid #d6e0ea;border-radius:24px;padding:24px 26px 22px;max-width:1120px;margin:0 auto;box-shadow:0 14px 40px #0000000b}
+.cs-top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding:0 2px 15px;margin-bottom:16px;border-bottom:1.5px solid #d9e3ed}
+.cs-title{margin:0;color:#0b5394;font:700 38px/1 Oswald,Arial,sans-serif;letter-spacing:.3px;text-transform:uppercase}
+.cs-top-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.cs-pill{font:700 10px Inter,Arial,sans-serif;letter-spacing:.6px;padding:7px 10px;border:1px solid #bfd2e4;border-radius:999px;color:#0b5394;background:#f1f7fd}
+.cs-pill.synced{background:#e8f4e9;color:#2e6b31;border-color:#b8d9bb}
+.cs-actions{display:flex;gap:8px;flex-wrap:wrap}.cs-actions .btn{font:700 11px Oswald,Arial,sans-serif;letter-spacing:.4px;padding:9px 13px;border-radius:999px}
+.cs-stack{display:flex;flex-direction:column;gap:12px}
+.cs-section{border:1.5px solid #0b5394;border-radius:18px;background:#fff;overflow:hidden;box-shadow:0 5px 16px #0b53940a}
+.cs-section-head{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;background:#0b5394;color:#fff;padding:9px 12px}
+.cs-section-num{width:30px;height:30px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#fff;color:#0b5394;font:800 14px/1 Oswald,Arial,sans-serif;box-shadow:0 2px 6px #0002}
+.cs-section-title{font:700 22px/1 Oswald,Arial,sans-serif;letter-spacing:.3px;text-transform:uppercase}
+.cs-section-count{font:700 10px Inter,Arial,sans-serif;opacity:.95;letter-spacing:.5px;white-space:nowrap}
+.cs-section-body{padding:10px;background:#f8fbfe}
+.cs-request-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cs-request{border:1px solid #cbd9e6;border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 3px 10px #00000007}
+.cs-request-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:#eef5fb;border-bottom:1px solid #d8e3ec}
+.cs-request-title{font:700 17px/1 Oswald,Arial,sans-serif;color:#0b5394;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-request-count{font:800 9px Inter,Arial,sans-serif;color:#0b5394;background:#fff;border:1px solid #bfd2e4;border-radius:999px;padding:5px 7px;white-space:nowrap}
+.cs-request-meta{padding:7px 10px 5px}.cs-category{font:700 13px/1.1 Oswald,Arial,sans-serif;text-transform:uppercase;color:#202a35}.cs-subline{margin-top:3px;font:700 9px/1.15 Inter,Arial,sans-serif;color:#2f74bd;text-transform:uppercase;letter-spacing:.2px}
+.cs-workers{display:flex;flex-direction:column;padding:0 7px 7px}
+.cs-worker{display:grid;grid-template-columns:31px 1fr 34px;min-height:31px;border-top:1px solid #edf1f5;border-radius:9px;overflow:hidden}
+.cs-worker-no{display:flex;align-items:center;justify-content:center;font:800 14px/1 Oswald,Arial,sans-serif;color:#111}
+.cs-worker-name{display:flex;align-items:center;padding:5px 7px;font:700 14px/1.05 Oswald,Arial,sans-serif;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-worker-move{display:flex;align-items:center;justify-content:center}.cs-worker-move select{width:28px;height:24px;border:0;background:transparent;color:#6c7480;font:700 10px Inter,Arial,sans-serif;cursor:pointer;outline:0}
+.cs-red .cs-worker-no,.cs-red .cs-worker-name,.cs-red .cs-worker-move{background:#f4cccc}.cs-red .cs-worker-no{background:#ff0000}
+.cs-orange .cs-worker-no,.cs-orange .cs-worker-name,.cs-orange .cs-worker-move{background:#fce5cd}.cs-orange .cs-worker-no{background:#ff9900}
+.cs-yellow .cs-worker-no,.cs-yellow .cs-worker-name,.cs-yellow .cs-worker-move{background:#fff2cc}.cs-yellow .cs-worker-no{background:#ffff00}
+.cs-blue .cs-worker-no,.cs-blue .cs-worker-name,.cs-blue .cs-worker-move{background:#cfe2f3}.cs-blue .cs-worker-no{background:#00ffff}
+.cs-green .cs-worker-no,.cs-green .cs-worker-name,.cs-green .cs-worker-move{background:#d9ead3}.cs-green .cs-worker-no{background:#00ff00}
+.cs-empty{padding:12px 10px;font:600 11px Inter,Arial,sans-serif;color:#6b7280}
+.cs-off-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.cs-off-item{display:grid;grid-template-columns:29px 1fr;min-height:32px;border:1px solid #d5e0ea;border-radius:10px;overflow:hidden;background:#fff}
+.cs-off-no{display:flex;align-items:center;justify-content:center;font:800 13px/1 Oswald,Arial,sans-serif;color:#111}.cs-off-name{display:flex;align-items:center;padding:5px 7px;font:700 13px/1.05 Oswald,Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-off-item.cs-red .cs-off-no{background:#ff0000}.cs-off-item.cs-red .cs-off-name{background:#f4cccc}.cs-off-item.cs-orange .cs-off-no{background:#ff9900}.cs-off-item.cs-orange .cs-off-name{background:#fce5cd}.cs-off-item.cs-yellow .cs-off-no{background:#ffff00}.cs-off-item.cs-yellow .cs-off-name{background:#fff2cc}.cs-off-item.cs-blue .cs-off-no{background:#00ffff}.cs-off-item.cs-blue .cs-off-name{background:#cfe2f3}.cs-off-item.cs-green .cs-off-no{background:#00ff00}.cs-off-item.cs-green .cs-off-name{background:#d9ead3}
+.cs-summary{margin-top:14px;border:1.5px solid #0b5394;border-radius:16px;overflow:hidden;background:#fff}.cs-summary-title{background:#0b5394;color:#fff;text-align:center;padding:8px 10px;font:700 19px/1 Oswald,Arial,sans-serif;letter-spacing:.4px;text-transform:uppercase}.cs-summary-head,.cs-summary-row{display:grid;grid-template-columns:1fr 1fr}.cs-summary-head>div{background:#3d85c6;color:#fff;text-align:center;padding:6px;font:700 12px/1 Oswald,Arial,sans-serif;text-transform:uppercase}.cs-summary-row>div{padding:7px;text-align:center;border-top:1px solid #0b5394;font:700 13px/1 Oswald,Arial,sans-serif;text-transform:uppercase}.cs-summary-head>div+div,.cs-summary-row>div+div{border-left:1px solid #0b5394}
+.cs-note{margin-top:9px;text-align:center;color:#77808c;font:500 10px/1.4 Inter,Arial,sans-serif}
+@media(max-width:980px){.cs-request-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cs-off-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:680px){.callsheet-shell{padding:18px;border-radius:18px}.cs-top{align-items:flex-start;flex-direction:column}.cs-title{font-size:31px}.cs-top-right{width:100%;justify-content:flex-start}.cs-request-grid{grid-template-columns:1fr}.cs-off-list{grid-template-columns:1fr 1fr}.cs-section-head{grid-template-columns:36px 1fr auto}.cs-section-title{font-size:19px}}
+@media print{.callsheet-shell{max-width:none;border:0;box-shadow:none;padding:5mm 6mm 4mm;border-radius:0}.cs-title{font-size:31px}.cs-stack{gap:3mm}.cs-section{break-inside:avoid;border-radius:10px}.cs-request-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.cs-request,.cs-summary{break-inside:avoid}.cs-worker{min-height:25px}.cs-worker-name,.cs-off-name{font-size:12px}.cs-worker-no,.cs-off-no{font-size:12px}}
+</style>
 </head>
-
 <body>
-
-  <!-- ==========================================
-       SIDEBAR
-  =========================================== -->
-
-  <aside class="sidebar">
-
-    <div class="brand">
-      <div class="brand-title">
-        WORKER SYSTEM
-      </div>
-
-      <div class="brand-subtitle">
-        Production Management
-      </div>
-    </div>
-
-    <nav class="menu">
-
-      <button
-        class="menu-button active"
-        data-page="dashboard"
-      >
-        Dashboard
-      </button>
-
-      <button
-        class="menu-button"
-        data-page="master-data"
-      >
-        Master Data
-      </button>
-
-      <button
-        class="menu-button"
-        data-page="roster"
-      >
-        Roster
-      </button>
-
-      <button
-        class="menu-button"
-        data-page="callsheet"
-      >
-        Callsheet
-      </button>
-
-      <button
-        class="menu-button"
-        data-page="schedule"
-      >
-        Master Schedule
-      </button>
-
-      <button
-        class="menu-button"
-        data-page="conflict"
-      >
-        Conflict Report
-      </button>
-
-    </nav>
-
-  </aside>
-
-
-  <!-- ==========================================
-       MAIN
-  =========================================== -->
-
-  <main class="main">
-
-    <!-- ========================================
-         DASHBOARD
-    ========================================= -->
-
-    <section
-      class="page active"
-      id="page-dashboard"
-    >
-
-      <div class="topbar">
-
-        <div class="page-title">
-
-          <h1>
-            Dashboard
-          </h1>
-
-          <p>
-            Worker management system
-          </p>
-
-        </div>
-
-        <div class="date-box">
-          25 November 2026
-        </div>
-
-      </div>
-
-
-      <div class="stats">
-
-        <div class="stat-card">
-
-          <div class="stat-label">
-            TOTAL WORKER
-          </div>
-
-          <div class="stat-value">
-            57
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-label">
-            ACTIVE
-          </div>
-
-          <div class="stat-value">
-            57
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-label">
-            INACTIVE
-          </div>
-
-          <div class="stat-value">
-            0
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-label">
-            TODAY WORKER
-          </div>
-
-          <div class="stat-value">
-            44
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <h2 class="section-title">
-        WORKER TEAM
-      </h2>
-
-
-      <div class="teams">
-
-        <div class="team-card team-red">
-
-          <div class="team-header">
-            RED
-          </div>
-
-          <div class="team-body">
-
-            <div class="team-number">
-              28
-            </div>
-
-            <div class="team-label">
-              WORKERS
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="team-card team-orange">
-
-          <div class="team-header">
-            ORANGE
-          </div>
-
-          <div class="team-body">
-
-            <div class="team-number">
-              8
-            </div>
-
-            <div class="team-label">
-              WORKERS
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="team-card team-yellow">
-
-          <div class="team-header">
-            YELLOW
-          </div>
-
-          <div class="team-body">
-
-            <div class="team-number">
-              7
-            </div>
-
-            <div class="team-label">
-              WORKERS
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="team-card team-blue">
-
-          <div class="team-header">
-            BLUE
-          </div>
-
-          <div class="team-body">
-
-            <div class="team-number">
-              8
-            </div>
-
-            <div class="team-label">
-              WORKERS
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="team-card team-green">
-
-          <div class="team-header">
-            GREEN
-          </div>
-
-          <div class="team-body">
-
-            <div class="team-number">
-              6
-            </div>
-
-            <div class="team-label">
-              WORKERS
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <h2 class="section-title">
-        QUICK ACTION
-      </h2>
-
-
-      <div class="quick-actions">
-
-        <button
-          class="action-card"
-          onclick="openPage('roster')"
-        >
-
-          <h3>
-            Generate Roster
-          </h3>
-
-          <p>
-            Generate worker assignment
-            berdasarkan kebutuhan hari ini.
-          </p>
-
-        </button>
-
-
-        <button
-          class="action-card"
-          onclick="openPage('callsheet')"
-        >
-
-          <h3>
-            Create Callsheet
-          </h3>
-
-          <p>
-            Buat callsheet berdasarkan roster
-            yang sudah dibuat.
-          </p>
-
-        </button>
-
-
-        <button
-          class="action-card"
-          onclick="openPage('conflict')"
-        >
-
-          <h3>
-            Conflict Report
-          </h3>
-
-          <p>
-            Cek kebutuhan worker yang tidak
-            dapat dipenuhi.
-          </p>
-
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================================
-         MASTER DATA
-    ========================================= -->
-
-    <section
-      class="page"
-      id="page-master-data"
-    >
-
-      <div class="topbar">
-
-        <div class="page-title">
-
-          <h1>
-            Master Data
-          </h1>
-
-          <p>
-            Worker database
-          </p>
-
-        </div>
-
-        <button
-          class="primary-button"
-          onclick="openWorkerModal()"
-        >
-          + ADD WORKER
-        </button>
-
-      </div>
-
-
-      <div class="toolbar">
-
-        <div class="toolbar-left">
-
-          <input
-            type="text"
-            class="search-box"
-            id="workerSearch"
-            placeholder="Search worker ID or name..."
-          >
-
-          <select
-            class="filter-select"
-            id="teamFilter"
-          >
-
-            <option value="ALL">
-              ALL TEAM
-            </option>
-
-            <option value="RED">
-              RED
-            </option>
-
-            <option value="ORANGE">
-              ORANGE
-            </option>
-
-            <option value="YELLOW">
-              YELLOW
-            </option>
-
-            <option value="BLUE">
-              BLUE
-            </option>
-
-            <option value="GREEN">
-              GREEN
-            </option>
-
-          </select>
-
-
-          <select
-            class="filter-select"
-            id="statusFilter"
-          >
-
-            <option value="ALL">
-              ALL STATUS
-            </option>
-
-            <option value="ACTIVE">
-              ACTIVE
-            </option>
-
-            <option value="INACTIVE">
-              INACTIVE
-            </option>
-
-          </select>
-
-        </div>
-
-      </div>
-
-
-      <div class="data-card">
-
-        <div class="table-wrap">
-
-          <table>
-
-            <thead>
-
-              <tr>
-                <th>WORKER ID</th>
-                <th>NAME</th>
-                <th>STATUS</th>
-                <th>TEAM</th>
-                <th>WORK COUNT</th>
-                <th>ACTION</th>
-              </tr>
-
-            </thead>
-
-            <tbody id="workerTableBody">
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================================
-         ROSTER
-    ========================================= -->
-
-    <section
-      class="page"
-      id="page-roster"
-    >
-
-      <div class="topbar">
-
-        <div class="page-title">
-
-          <h1>
-            Roster
-          </h1>
-
-          <p>
-            Roster generator
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="data-card">
-
-        <div
-          style="
-            padding:35px;
-            text-align:center;
-          "
-        >
-
-          <h2
-            style="
-              font-family:Oswald;
-              color:#0b5394;
-              margin-bottom:10px;
-            "
-          >
-            ROSTER GENERATOR
-          </h2>
-
-          <p
-            style="
-              color:#6b7280;
-              margin-bottom:20px;
-            "
-          >
-            Halaman roster akan kita sambungkan
-            ke Google Sheets pada tahap berikutnya.
-          </p>
-
-          <button
-            class="primary-button"
-            onclick="alert('Roster engine akan disambungkan nanti.')"
-          >
-            GENERATE ROSTER
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================================
-         CALLSHEET
-    ========================================= -->
-
-    <section
-      class="page"
-      id="page-callsheet"
-    >
-
-      <div class="topbar">
-
-        <div class="page-title">
-
-          <h1>
-            Callsheet
-          </h1>
-
-          <p>
-            Worker callsheet
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="data-card">
-
-        <div
-          style="
-            padding:35px;
-            text-align:center;
-          "
-        >
-
-          <h2
-            style="
-              font-family:Oswald;
-              color:#0b5394;
-              margin-bottom:10px;
-            "
-          >
-            CALLSHEET
-          </h2>
-
-          <p
-            style="
-              color:#6b7280;
-            "
-          >
-            Preview callsheet akan kita bangun
-            setelah UI utama selesai.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================================
-         MASTER SCHEDULE
-    ========================================= -->
-
-    <section
-      class="page"
-      id="page-schedule"
-    >
-
-      <div class="topbar">
-
-        <div class="page-title">
-
-          <h1>
-            Master Schedule
-          </h1>
-
-          <p>
-            Worker history
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="data-card">
-
-        <div
-          style="
-            padding:35px;
-            text-align:center;
-          "
-        >
-
-          <h2
-            style="
-              font-family:Oswald;
-              color:#0b5394;
-              margin-bottom:10px;
-            "
-          >
-            MASTER SCHEDULE
-          </h2>
-
-          <p
-            style="
-              color:#6b7280;
-            "
-          >
-            History W/O akan kita tampilkan di
-            tahap berikutnya.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ========================================
-         CONFLICT
-    ========================================= -->
-
-    <section
-      class="page"
-      id="page-conflict"
-    >
-
-      <div class="topbar">
-
-        <div class="page-title">
-
-          <h1>
-            Conflict Report
-          </h1>
-
-          <p>
-            Roster conflict monitoring
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="data-card">
-
-        <div
-          style="
-            padding:35px;
-            text-align:center;
-          "
-        >
-
-          <h2
-            style="
-              font-family:Oswald;
-              color:#c00000;
-              margin-bottom:10px;
-            "
-          >
-            NO CONFLICT
-          </h2>
-
-          <p
-            style="
-              color:#6b7280;
-            "
-          >
-            Tidak ada conflict aktif.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- ==========================================
-       WORKER MODAL
-  =========================================== -->
-
-  <div
-    class="modal-backdrop"
-    id="workerModal"
-  >
-
-    <div class="modal">
-
-      <div class="modal-header">
-
-        <h2 id="modalTitle">
-          ADD WORKER
-        </h2>
-
-        <button
-          class="modal-close"
-          onclick="closeWorkerModal()"
-        >
-          ×
-        </button>
-
-      </div>
-
-
-      <div class="modal-body">
-
-        <div class="form-group">
-
-          <label class="form-label">
-            WORKER ID
-          </label>
-
-          <input
-            class="form-input"
-            id="workerIdInput"
-            placeholder="W001"
-          >
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label class="form-label">
-            NAME
-          </label>
-
-          <input
-            class="form-input"
-            id="workerNameInput"
-            placeholder="Worker name"
-          >
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label class="form-label">
-            STATUS
-          </label>
-
-          <select
-            class="form-select"
-            id="workerStatusInput"
-          >
-
-            <option value="ACTIVE">
-              ACTIVE
-            </option>
-
-            <option value="INACTIVE">
-              INACTIVE
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label class="form-label">
-            TEAM
-          </label>
-
-          <select
-            class="form-select"
-            id="workerTeamInput"
-          >
-
-            <option value="RED">
-              RED
-            </option>
-
-            <option value="ORANGE">
-              ORANGE
-            </option>
-
-            <option value="YELLOW">
-              YELLOW
-            </option>
-
-            <option value="BLUE">
-              BLUE
-            </option>
-
-            <option value="GREEN">
-              GREEN
-            </option>
-
-          </select>
-
-        </div>
-
-      </div>
-
-
-      <div class="modal-footer">
-
-        <button
-          class="secondary-button"
-          onclick="closeWorkerModal()"
-        >
-          CANCEL
-        </button>
-
-        <button
-          class="primary-button"
-          onclick="saveWorker()"
-        >
-          SAVE WORKER
-        </button>
-
-      </div>
-
-    </div>
-
+<aside class="sidebar">
+  <div class="brand">WORKER SYSTEM<small>Dummy Prototype — Backend belum tersambung</small></div>
+  <div class="menu">
+    <button class="active" data-page="dashboard">Dashboard</button>
+    <button data-page="master">Master Data</button>
+    <button data-page="roster">Roster</button>
+    <button data-page="callsheet">Callsheet</button>
+    <button data-page="schedule">Master Schedule</button>
+    <button data-page="conflict">Conflict Report</button>
   </div>
+</aside>
+<main class="main">
+<section id="page-dashboard" class="page active">
+  <div class="topbar"><div class="title"><h1>Dashboard</h1><p>Worker management system — dummy data</p></div><div class="box" style="padding:11px 15px;font-weight:700" id="today"></div></div>
+  <div class="stats">
+    <div class="stat"><span>TOTAL WORKER</span><strong id="st-total">0</strong></div>
+    <div class="stat"><span>ACTIVE</span><strong id="st-active">0</strong></div>
+    <div class="stat"><span>INACTIVE</span><strong id="st-inactive">0</strong></div>
+    <div class="stat"><span>TODAY WORKER</span><strong id="st-today">0</strong></div>
+  </div>
+  <div class="section">WORKER TEAM</div><div class="teams" id="teamCards"></div>
+  <div class="section">QUICK ACTION</div><div class="actions">
+    <button onclick="openPage('master')"><h3>Master Data</h3><p>Kelola worker, status, team, dan total work.</p></button>
+    <button onclick="openPage('roster')"><h3>Generate Roster</h3><p>Generate roster dari request dummy dan lanjut ke callsheet.</p></button>
+    <button onclick="openPage('callsheet')"><h3>View Callsheet</h3><p>Lihat hasil penempatan worker per location.</p></button>
+    <button onclick="openPage('schedule')"><h3>Master Schedule</h3><p>Lihat history W/O dan TOTAL WORK.</p></button>
+    <button onclick="openPage('conflict')"><h3>Conflict Report</h3><p>Cek kapasitas, shortage, inactive, dan request breakdown.</p></button>
+    <button onclick="resetDemo()"><h3>Reset Dummy</h3><p>Kembalikan seluruh data prototype ke kondisi awal.</p></button>
+  </div>
+  <div class="footer-note">Semua data di halaman ini hanya tersimpan di browser. Refresh page akan mengembalikan data dummy awal.</div>
+</section>
 
+<section id="page-master" class="page">
+  <div class="topbar"><div class="title"><h1>Master Data</h1><p>Worker database — dummy</p></div><button class="btn" onclick="openWorkerModal()">+ ADD WORKER</button></div>
+  <div class="toolbar"><input class="input" id="search" placeholder="Search worker ID or name..."><select class="select" id="filterTeam"><option>ALL</option><option>RED</option><option>ORANGE</option><option>YELLOW</option><option>BLUE</option><option>GREEN</option></select><select class="select" id="filterStatus"><option>ALL</option><option>ACTIVE</option><option>INACTIVE</option></select></div>
+  <div class="box table"><table><thead><tr><th>WORKER ID</th><th>NAME</th><th>STATUS</th><th>TEAM</th><th>TOTAL WORK</th><th>YESTERDAY</th><th>ACTION</th></tr></thead><tbody id="workerBody"></tbody></table></div>
+</section>
 
-  <script>
+<section id="page-roster" class="page">
+  <div class="topbar"><div class="title"><h1>Roster</h1><p>Generate roster → Callsheet → Update Master Schedule</p></div><div class="box"><input id="rosterDate" type="date" class="input"></div></div>
+  <div class="box panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+      <div><b>REQUEST INPUT</b><div class="muted" style="margin-top:4px">Internal location tetap WORKSHOP / SHOOTING / PREPS / CEREMONY. Display label bisa custom.</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn secondary" onclick="addRequest()">+ REQUEST</button><button class="btn danger" onclick="loadConflictDemo()">TEST CONFLICT</button><button class="btn" onclick="generateRoster()">GENERATE ROSTER</button></div>
+    </div>
+    <div id="requests"></div><div id="rosterMessage"></div><div id="rosterSummary" style="margin-top:14px"></div>
+  </div>
+</section>
 
-    /* ========================================
-       DUMMY DATA
-    ======================================== */
+<section id="page-callsheet" class="page">
+  <div class="topbar screen-only"><div class="title"><h1>Callsheet</h1><p>Hasil roster — dummy frontend</p></div><div style="display:flex;gap:8px"><button class="btn secondary" onclick="downloadCallsheet()">DOWNLOAD FOTO</button><button class="btn success" onclick="updateMasterSchedule()">UPDATE MASTER SCHEDULE</button></div></div>
+  <div id="callsheetRoot"></div>
+</section>
 
-    let workers = [
+<section id="page-schedule" class="page">
+  <div class="topbar"><div class="title"><h1>Master Schedule</h1><p>History W/O + TOTAL WORK — dummy</p></div><div style="display:flex;gap:8px"><button class="btn secondary" onclick="openPage('callsheet')">BACK TO CALLSHEET</button></div></div>
+  <div id="scheduleInfo"></div><div class="box schedule-wrap" style="margin-top:14px"><table class="schedule-table"><thead id="scheduleHead"></thead><tbody id="scheduleBody"></tbody></table></div>
+</section>
 
-      {
-        id: "W001",
-        name: "Adi Susanto",
-        status: "ACTIVE",
-        team: "RED",
-        work: 18
-      },
+<section id="page-conflict" class="page">
+  <div class="topbar"><div class="title"><h1>Conflict Report</h1><p>Kapasitas, shortage, inactive, dan request breakdown — dummy</p></div><button class="btn secondary" onclick="openPage('roster')">BACK TO ROSTER</button></div>
+  <div id="conflictBox"></div>
+</section>
+</main>
 
-      {
-        id: "W002",
-        name: "Budi Santoso",
-        status: "ACTIVE",
-        team: "RED",
-        work: 17
-      },
+<div class="modal" id="modal"><div class="dialog"><h2 id="modalTitle">ADD WORKER</h2><div class="body"><label>WORKER ID</label><input id="mId"><label>NAME</label><input id="mName"><label>STATUS</label><select id="mStatus"><option>ACTIVE</option><option>INACTIVE</option></select><label>TEAM</label><select id="mTeam"><option>RED</option><option>ORANGE</option><option>YELLOW</option><option>BLUE</option><option>GREEN</option></select></div><div class="foot"><button class="btn secondary" onclick="closeModal()">CANCEL</button><button class="btn" onclick="saveWorker()">SAVE</button></div></div></div>
 
-      {
-        id: "W003",
-        name: "Candra",
-        status: "ACTIVE",
-        team: "RED",
-        work: 17
-      },
+<script>
+const TEAMS=['RED','ORANGE','YELLOW','BLUE','GREEN'];
+const TEAM_COUNTS={RED:28,ORANGE:8,YELLOW:7,BLUE:8,GREEN:6};
+const TEAM_BADGE={RED:'b-red',ORANGE:'b-orange',YELLOW:'b-yellow',BLUE:'b-blue',GREEN:'b-green'};
+let workers=[];
+let requests=[];
+let history={};
+let lastRoster=null;
+let lastConflict=null;
+let committedDate=null;
+let editing=null;
 
-      {
-        id: "W004",
-        name: "Deni",
-        status: "ACTIVE",
-        team: "ORANGE",
-        work: 16
-      },
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>{let x=new Date(d);x.setHours(12,0,0,0);return x.toISOString().slice(0,10)};
+const dateLabel=d=>new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+const esc=x=>String(x??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function chooseLowest(pool,n){let out=[];let rest=[...pool];while(out.length<n&&rest.length){let min=Math.min(...rest.map(w=>w.work));let group=shuffle(rest.filter(w=>w.work===min));for(const w of group){if(out.length<n)out.push(w)}rest=rest.filter(w=>!out.some(x=>x.id===w.id))}return out}
+function yesterdayOf(date){let d=new Date(date+'T12:00:00');d.setDate(d.getDate()-1);return iso(d)}
 
-      {
-        id: "W005",
-        name: "Fahmi",
-        status: "ACTIVE",
-        team: "YELLOW",
-        work: 15
-      },
-
-      {
-        id: "W006",
-        name: "Yudi",
-        status: "ACTIVE",
-        team: "YELLOW",
-        work: 14
-      },
-
-      {
-        id: "W007",
-        name: "Iwan",
-        status: "INACTIVE",
-        team: "YELLOW",
-        work: 13
-      },
-
-      {
-        id: "W008",
-        name: "Dinda",
-        status: "ACTIVE",
-        team: "BLUE",
-        work: 12
-      },
-
-      {
-        id: "W009",
-        name: "Andi",
-        status: "ACTIVE",
-        team: "GREEN",
-        work: 11
-      },
-
-      {
-        id: "W010",
-        name: "Rian",
-        status: "ACTIVE",
-        team: "GREEN",
-        work: 10
-      }
-
-    ];
-
-
-    let editingWorkerId = null;
-
-
-    /* ========================================
-       TEAM HELPERS
-    ======================================== */
-
-    function getTeamBadgeClass(team) {
-
-      const map = {
-
-        RED: "badge-red",
-        ORANGE: "badge-orange",
-        YELLOW: "badge-yellow",
-        BLUE: "badge-blue",
-        GREEN: "badge-green"
-
-      };
-
-      return map[team] || "";
-
+function seedDemo(){
+  workers=[];history={};lastRoster=null;lastConflict=null;committedDate=null;editing=null;
+  let n=1;
+  TEAMS.forEach(team=>{
+    for(let i=0;i<TEAM_COUNTS[team];i++){
+      const id='W'+String(n).padStart(3,'0');
+      const name='Worker '+pad(n);
+      const status=(n===11||n===37)?'INACTIVE':'ACTIVE';
+      const w={id,name,status,team,work:0};
+      workers.push(w);n++;
     }
-
-
-    /* ========================================
-       NAVIGATION
-    ======================================== */
-
-    function openPage(pageName) {
-
-      document
-        .querySelectorAll(".page")
-        .forEach(function(page) {
-
-          page.classList.remove("active");
-
-        });
-
-
-      const target =
-        document.getElementById(
-          "page-" + pageName
-        );
-
-
-      if (target) {
-
-        target.classList.add("active");
-
-      }
-
-
-      document
-        .querySelectorAll(".menu-button")
-        .forEach(function(button) {
-
-          button.classList.remove("active");
-
-          if (
-            button.dataset.page === pageName
-          ) {
-
-            button.classList.add("active");
-
-          }
-
-        });
-
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-    }
-
-
-    document
-      .querySelectorAll(".menu-button")
-      .forEach(function(button) {
-
-        button.addEventListener(
-          "click",
-          function() {
-
-            openPage(
-              button.dataset.page
-            );
-
-          }
-        );
-
-      });
-
-
-    /* ========================================
-       RENDER MASTER DATA
-    ======================================== */
-
-    function renderWorkers() {
-
-      const tbody =
-        document.getElementById(
-          "workerTableBody"
-        );
-
-
-      const search =
-        document
-          .getElementById("workerSearch")
-          .value
-          .trim()
-          .toLowerCase();
-
-
-      const team =
-        document
-          .getElementById("teamFilter")
-          .value;
-
-
-      const status =
-        document
-          .getElementById("statusFilter")
-          .value;
-
-
-      const filtered =
-        workers.filter(
-          function(worker) {
-
-            const matchesSearch =
-              !search ||
-              worker.id
-                .toLowerCase()
-                .includes(search) ||
-              worker.name
-                .toLowerCase()
-                .includes(search);
-
-
-            const matchesTeam =
-              team === "ALL" ||
-              worker.team === team;
-
-
-            const matchesStatus =
-              status === "ALL" ||
-              worker.status === status;
-
-
-            return (
-              matchesSearch &&
-              matchesTeam &&
-              matchesStatus
-            );
-
-          }
-        );
-
-
-      if (!filtered.length) {
-
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6">
-              <div class="empty">
-                Worker tidak ditemukan.
-              </div>
-            </td>
-          </tr>
-        `;
-
-        return;
-
-      }
-
-
-      tbody.innerHTML =
-        filtered
-          .map(function(worker) {
-
-            const inactive =
-              worker.status === "INACTIVE";
-
-
-            return `
-
-              <tr
-                class="${inactive ? "inactive-row" : ""}"
-              >
-
-                <td>
-                  <span class="worker-id">
-                    ${escapeHtml(worker.id)}
-                  </span>
-                </td>
-
-                <td>
-                  <span class="worker-name">
-                    ${escapeHtml(worker.name)}
-                  </span>
-                </td>
-
-                <td>
-
-                  <span
-                    class="
-                      status-badge
-                      ${
-                        worker.status === "ACTIVE"
-                          ? "status-active"
-                          : "status-inactive"
-                      }
-                    "
-                  >
-                    ${worker.status}
-                  </span>
-
-                </td>
-
-                <td>
-
-                  <span
-                    class="
-                      team-badge
-                      ${getTeamBadgeClass(worker.team)}
-                    "
-                  >
-                    ${worker.team}
-                  </span>
-
-                </td>
-
-                <td>
-                  <strong>
-                    ${worker.work}
-                  </strong>
-                </td>
-
-                <td>
-
-                  <button
-                    class="action-small"
-                    onclick="
-                      editWorker('${worker.id}')
-                    "
-                  >
-                    EDIT
-                  </button>
-
-                </td>
-
-              </tr>
-
-            `;
-
-          })
-          .join("");
-
-    }
-
-
-    /* ========================================
-       SEARCH / FILTER
-    ======================================== */
-
-    document
-      .getElementById("workerSearch")
-      .addEventListener(
-        "input",
-        renderWorkers
-      );
-
-
-    document
-      .getElementById("teamFilter")
-      .addEventListener(
-        "change",
-        renderWorkers
-      );
-
-
-    document
-      .getElementById("statusFilter")
-      .addEventListener(
-        "change",
-        renderWorkers
-      );
-
-
-    /* ========================================
-       MODAL
-    ======================================== */
-
-    function openWorkerModal(worker = null) {
-
-      editingWorkerId =
-        worker
-          ? worker.id
-          : null;
-
-
-      document
-        .getElementById("modalTitle")
-        .textContent =
-          worker
-            ? "EDIT WORKER"
-            : "ADD WORKER";
-
-
-      document
-        .getElementById("workerIdInput")
-        .value =
-          worker
-            ? worker.id
-            : "";
-
-
-      document
-        .getElementById("workerNameInput")
-        .value =
-          worker
-            ? worker.name
-            : "";
-
-
-      document
-        .getElementById("workerStatusInput")
-        .value =
-          worker
-            ? worker.status
-            : "ACTIVE";
-
-
-      document
-        .getElementById("workerTeamInput")
-        .value =
-          worker
-            ? worker.team
-            : "RED";
-
-
-      document
-        .getElementById("workerIdInput")
-        .disabled =
-          Boolean(worker);
-
-
-      document
-        .getElementById("workerModal")
-        .classList
-        .add("show");
-
-    }
-
-
-    function closeWorkerModal() {
-
-      document
-        .getElementById("workerModal")
-        .classList
-        .remove("show");
-
-    }
-
-
-    function editWorker(id) {
-
-      const worker =
-        workers.find(
-          function(item) {
-
-            return item.id === id;
-
-          }
-        );
-
-
-      if (worker) {
-
-        openWorkerModal(worker);
-
-      }
-
-    }
-
-
-    function saveWorker() {
-
-      const id =
-        document
-          .getElementById("workerIdInput")
-          .value
-          .trim()
-          .toUpperCase();
-
-
-      const name =
-        document
-          .getElementById("workerNameInput")
-          .value
-          .trim();
-
-
-      const status =
-        document
-          .getElementById("workerStatusInput")
-          .value;
-
-
-      const team =
-        document
-          .getElementById("workerTeamInput")
-          .value;
-
-
-      if (!id || !name) {
-
-        alert(
-          "Worker ID dan Name wajib diisi."
-        );
-
-        return;
-
-      }
-
-
-      if (editingWorkerId) {
-
-        const index =
-          workers.findIndex(
-            function(item) {
-
-              return (
-                item.id ===
-                editingWorkerId
-              );
-
-            }
-          );
-
-
-        if (index !== -1) {
-
-          workers[index].name =
-            name;
-
-          workers[index].status =
-            status;
-
-          workers[index].team =
-            team;
-
-        }
-
-      } else {
-
-        const exists =
-          workers.some(
-            function(item) {
-
-              return item.id === id;
-
-            }
-          );
-
-
-        if (exists) {
-
-          alert(
-            "Worker ID sudah digunakan."
-          );
-
-          return;
-
-        }
-
-
-        workers.push({
-
-          id: id,
-          name: name,
-          status: status,
-          team: team,
-          work: 0
-
-        });
-
-      }
-
-
-      closeWorkerModal();
-
-      renderWorkers();
-
-    }
-
-
-    /* ========================================
-       ESCAPE HTML
-    ======================================== */
-
-    function escapeHtml(value) {
-
-      return String(value)
-
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-    }
-
-
-    /* ========================================
-       INIT
-    ======================================== */
-
-    renderWorkers();
-
-  </script>
-
+  });
+  let base=new Date();
+  base.setHours(12,0,0,0);
+  base.setDate(base.getDate()-1);
+  for(let back=10;back>=0;back--){
+    let d=new Date(base);d.setDate(base.getDate()-back);let key=iso(d);history[key]={};
+    workers.forEach(w=>{
+      if(w.status==='INACTIVE'){history[key][w.id]='OFF';return}
+      const num=parseInt(w.id.slice(1));
+      const pattern=(num*3+back*5)%7;
+      history[key][w.id]=pattern<4?'W':'O';
+    });
+  }
+  // Make yesterday more useful for demo: some OFF groups to prove priority/random branch.
+  const y=yesterdayOf(todayKey());
+  if(!history[y])history[y]={};
+  workers.forEach(w=>{if(w.status==='INACTIVE')history[y][w.id]='O';else history[y][w.id]=((parseInt(w.id.slice(1))*7)%10<4)?'O':'W'});
+  recomputeTotals();
+  requests=defaultRequests();
+}
+function todayKey(){return document.getElementById('rosterDate')?.value||iso(new Date())}
+function defaultRequests(){return [
+  {id:1,location:'WORKSHOP',team:'RED',request:4,category:'LOAD OUT',display:'WORKSHOP'},
+  {id:2,location:'SHOOTING',team:'RED',request:5,category:'KLOTER 1',display:'SKY BIKE'},
+  {id:3,location:'SHOOTING',team:'ORANGE',request:3,category:'UNIT B',display:'RIVER SIDE'},
+  {id:4,location:'PREPS',team:'YELLOW',request:2,category:'PREP UNIT',display:'PREPS BOND'},
+  {id:5,location:'CEREMONY',team:'BLUE',request:2,category:'CEREMONY A',display:'CEREMONY'},
+  {id:6,location:'PREPS',team:'GREEN',request:2,category:'ART PREP',display:'PREPS GREEN'}
+]}
+function recomputeTotals(){workers.forEach(w=>w.work=Object.values(history).reduce((n,day)=>n+(day[w.id]==='W'?1:0),0))}
+function openPage(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelectorAll('.menu button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));if(p==='dashboard')refreshDashboard();if(p==='master')renderWorkers();if(p==='roster')renderRequests();if(p==='callsheet')renderCallsheet();if(p==='schedule')renderSchedule();if(p==='conflict')renderConflict()}
+document.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>openPage(b.dataset.page));
+function refreshDashboard(){document.getElementById('today').textContent=dateLabel(todayKey());const active=workers.filter(w=>w.status==='ACTIVE').length;const todayWork=lastRoster?Object.values(lastRoster.assignments).filter(a=>a.status==='WORK').length:0;document.getElementById('st-total').textContent=workers.length;document.getElementById('st-active').textContent=active;document.getElementById('st-inactive').textContent=workers.length-active;document.getElementById('st-today').textContent=todayWork;document.getElementById('teamCards').innerHTML=TEAMS.map(t=>`<div class="team ${t.toLowerCase()}"><h3>${t}</h3><p>${workers.filter(w=>w.team===t).length}</p></div>`).join('')}
+function renderWorkers(){const q=document.getElementById('search').value.toLowerCase(),t=document.getElementById('filterTeam').value,s=document.getElementById('filterStatus').value;let arr=workers.filter(w=>(!q||w.id.toLowerCase().includes(q)||w.name.toLowerCase().includes(q))&&(t==='ALL'||w.team===t)&&(s==='ALL'||w.status===s));document.getElementById('workerBody').innerHTML=arr.map(w=>`<tr class="${w.status==='INACTIVE'?'row-inactive':''}"><td>${w.id}</td><td><b>${esc(w.name)}</b></td><td><span class="status ${w.status==='ACTIVE'?'active':'inactive'}">${w.status}</span></td><td><span class="badge ${TEAM_BADGE[w.team]}">${w.team}</span></td><td><b class="${isLowestWork(w)?'low-work':''}">${w.work}</b></td><td>${yesterdayStatus(w.id)==='W'?'WORK':'OFF'}</td><td><button class="mini" onclick="editWorker('${w.id}')">EDIT</button></td></tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#6b7280">Worker tidak ditemukan.</td></tr>'}
+function isLowestWork(w){const vals=workers.filter(x=>x.status==='ACTIVE'&&x.team===w.team).map(x=>x.work);return vals.length&&w.work===Math.min(...vals)}
+function yesterdayStatus(id){let y=yesterdayOf(todayKey());return history[y]?.[id]||'O'}
+['search','filterTeam','filterStatus'].forEach(id=>document.getElementById(id).addEventListener('input',renderWorkers));
+function openWorkerModal(w=null){editing=w?.id||null;document.getElementById('modalTitle').textContent=w?'EDIT WORKER':'ADD WORKER';document.getElementById('mId').value=w?.id||'';document.getElementById('mId').disabled=!!w;document.getElementById('mName').value=w?.name||'';document.getElementById('mStatus').value=w?.status||'ACTIVE';document.getElementById('mTeam').value=w?.team||'RED';document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function editWorker(id){openWorkerModal(workers.find(w=>w.id===id))}
+function saveWorker(){let id=document.getElementById('mId').value.trim().toUpperCase(),name=document.getElementById('mName').value.trim(),status=document.getElementById('mStatus').value,team=document.getElementById('mTeam').value;if(!id||!name)return alert('ID dan NAME wajib diisi');if(editing){let w=workers.find(x=>x.id===editing);Object.assign(w,{name,status,team})}else{if(workers.some(x=>x.id===id))return alert('ID sudah ada');workers.push({id,name,status,team,work:0})}recomputeTotals();closeModal();refreshDashboard();renderWorkers();renderSchedule()}
+
+function renderRequests(){document.getElementById('requests').innerHTML=requests.map((r,i)=>`<div class="request"><select class="select" onchange="requests[${i}].location=this.value"><option ${r.location==='WORKSHOP'?'selected':''}>WORKSHOP</option><option ${r.location==='SHOOTING'?'selected':''}>SHOOTING</option><option ${r.location==='PREPS'?'selected':''}>PREPS</option><option ${r.location==='CEREMONY'?'selected':''}>CEREMONY</option></select><select class="select" onchange="requests[${i}].team=this.value">${TEAMS.map(t=>`<option ${r.team===t?'selected':''}>${t}</option>`).join('')}</select><input class="input" type="number" min="0" value="${r.request}" onchange="requests[${i}].request=Math.max(0,Number(this.value)||0)"><input class="input" value="${esc(r.category)}" onchange="requests[${i}].category=this.value"><input class="input" value="${esc(r.display)}" onchange="requests[${i}].display=this.value"><button class="iconbtn" onclick="removeRequest(${i})">✕</button></div>`).join('')}
+function addRequest(){requests.push({id:Date.now(),location:'WORKSHOP',team:'RED',request:1,category:'NEW REQUEST',display:'WORKSHOP'});renderRequests()}
+function removeRequest(i){requests.splice(i,1);renderRequests()}
+function loadConflictDemo(){requests=defaultRequests().map(x=>({...x}));requests.push({id:99,location:'SHOOTING',team:'RED',request:40,category:'OVER CAPACITY',display:'CONFLICT DEMO'});renderRequests();generateRoster()}
+
+function buildAssignmentsForTeam(team,demand){
+  const active=workers.filter(w=>w.status==='ACTIVE'&&w.team===team);
+  if(demand>active.length)return {conflict:true,team,demand,active:active.length,inactive:workers.filter(w=>w.team===team&&w.status==='INACTIVE'),remaining:demand-active.length};
+  const y=yesterdayOf(todayKey());
+  const off=shuffle(active.filter(w=>history[y]?.[w.id]==='O'));
+  let selected=[];
+  if(off.length<=demand){selected=[...off]}
+  else{selected=off.slice(0,demand)}
+  if(selected.length<demand){const pool=active.filter(w=>!selected.some(x=>x.id===w.id)&&history[y]?.[w.id]!=='O');selected.push(...chooseLowest(pool,demand-selected.length))}
+  const selectedIds=new Set(selected.map(w=>w.id));
+  return {conflict:false,team,demand,active:active.length,selected,all:active.map(w=>({workerId:w.id,status:selectedIds.has(w.id)?'WORK':'OFF'}))}
+}
+function distributeToRequests(teamResult,teamRequests){
+  let selected=[...teamResult.selected];let out=[];
+  teamRequests.forEach(req=>{
+    const take=selected.splice(0,Math.min(req.request,selected.length));
+    out.push({...req,workerIds:take.map(w=>w.id)});
+  });
+  return out;
+}
+function generateRoster(){
+  const demands={};TEAMS.forEach(t=>demands[t]=requests.filter(r=>r.team===t).reduce((s,r)=>s+r.request,0));
+  let teamResults={};let conflicts=[];
+  TEAMS.forEach(t=>{teamResults[t]=buildAssignmentsForTeam(t,demands[t]);if(teamResults[t].conflict)conflicts.push({team:t,...teamResults[t],requests:requests.filter(r=>r.team===t)})});
+  if(conflicts.length){lastRoster=null;lastConflict={date:todayKey(),items:conflicts};document.getElementById('rosterMessage').innerHTML=`<div class="conf"><b>ROSTER CONFLICT</b><div style="margin-top:6px">Demand melebihi active capacity pada satu atau lebih team. Roster belum dibuat.</div></div>`;document.getElementById('rosterSummary').innerHTML='';renderConflict();return}
+  lastConflict=null;
+  let assignments={};let byRequest={};
+  TEAMS.forEach(t=>{let trs=requests.filter(r=>r.team===t);distributeToRequests(teamResults[t],trs).forEach(r=>{byRequest[r.id]=r;r.workerIds.forEach(id=>assignments[id]={status:'WORK',requestId:r.id})});teamResults[t].all.forEach(x=>{if(!assignments[x.workerId])assignments[x.workerId]={status:'OFF',requestId:null}})});
+  lastRoster={date:todayKey(),assignments,byRequest,teamResults};
+  committedDate=null;
+  document.getElementById('rosterMessage').innerHTML='<div class="ok"><b>ROSTER GENERATED</b><div style="margin-top:5px">Prioritas OFF kemarin → jika masih kurang gunakan TOTAL WORK terendah → tie random. Data belum masuk Master Schedule sampai tombol UPDATE ditekan.</div></div>';
+  renderRosterSummary();renderCallsheet();refreshDashboard();
+}
+function renderRosterSummary(){if(!lastRoster){document.getElementById('rosterSummary').innerHTML='';return}let rows=TEAMS.map(t=>{let r=lastRoster.teamResults[t];let work=Object.values(lastRoster.assignments).filter(a=>a.status==='WORK').length;return `<div class="request-chip"><h4>${t}</h4><div class="sub">ACTIVE ${r.active} · DEMAND ${r.demand} · SELECTED ${r.selected.length}</div></div>`}).join('');document.getElementById('rosterSummary').innerHTML=`<div class="grid">${rows}</div><div class="info" style="margin-top:14px"><b>Next step:</b> buka menu Callsheet untuk melihat hasil assignment per location, lalu klik <b>UPDATE MASTER SCHEDULE</b>.</div>`}
+
+function moveWorker(workerId,fromReqId,toReqId){
+  if(!lastRoster)return;
+  const a=lastRoster.byRequest[fromReqId],b=lastRoster.byRequest[toReqId];if(!a||!b)return;
+  const w=workers.find(x=>x.id===workerId);if(!w||a.team!==b.team){alert('Prototype hanya mengizinkan pindah antar request dalam team yang sama.');return}
+  if(!a.workerIds.includes(workerId))return;
+  if(!b.workerIds.includes(workerId)){
+    a.workerIds=a.workerIds.filter(id=>id!==workerId);
+    b.workerIds.push(workerId);
+    lastRoster.assignments[workerId].requestId=toReqId;
+    renderCallsheet();
+  }
+}
+function renderCallsheet(){
+  const root=document.getElementById('callsheetRoot');
+  if(!lastRoster){root.innerHTML=`<div class="box panel"><div class="info"><b>Belum ada callsheet.</b><br>Generate roster dulu dari menu Roster.</div></div>`;return}
+  const date=lastRoster.date;
+  const workCount=Object.values(lastRoster.assignments).filter(a=>a.status==='WORK').length;
+  const offCount=Object.values(lastRoster.assignments).filter(a=>a.status==='OFF').length;
+  const statusText=committedDate===date?'SYNCED TO MASTER SCHEDULE':'DRAFT';
+
+  const locationOrder=['WORKSHOP','SHOOTING','PREPS','CEREMONY'];
+  const locationNumber={WORKSHOP:1,SHOOTING:2,PREPS:3,CEREMONY:4,OFF:5};
+  const requestsByLocation={WORKSHOP:[],SHOOTING:[],PREPS:[],CEREMONY:[]};
+  requests.forEach(req=>{
+    if(lastRoster.byRequest[req.id] && requestsByLocation[req.location]) requestsByLocation[req.location].push(req);
+  });
+
+  const renderRequest=req=>{
+    const ids=lastRoster.byRequest[req.id]?.workerIds||[];
+    const body=ids.length
+      ? ids.map((id,i)=>callWorkerRow(id,i+1,req.id)).join('')
+      : '<div class="cs-empty">Belum ada worker.</div>';
+    return `<div class="cs-request">
+      <div class="cs-request-top"><span class="cs-request-title">${esc(req.display||req.location)}</span><span class="cs-request-count">${ids.length}/${req.request}</span></div>
+      <div class="cs-request-meta"><div class="cs-category">${esc(req.category||'REQUEST')}</div><div class="cs-subline">${esc(req.location)} · ${esc(req.team)}</div></div>
+      <div class="cs-workers">${body}</div>
+    </div>`;
+  };
+
+  const renderLocationRow=(location)=>{
+    const items=requestsByLocation[location]||[];
+    const locationWorkers=items.reduce((sum,r)=>sum+(lastRoster.byRequest[r.id]?.workerIds?.length||0),0);
+    const body=items.length
+      ? `<div class="cs-request-grid">${items.map(renderRequest).join('')}</div>`
+      : '<div class="cs-empty">Tidak ada request untuk lokasi ini.</div>';
+    return `<section class="cs-section">
+      <div class="cs-section-head">
+        <div class="cs-section-num">${locationNumber[location]}</div>
+        <div class="cs-section-title">${location}</div>
+        <div class="cs-section-count">${locationWorkers} WORKER</div>
+      </div>
+      <div class="cs-section-body">${body}</div>
+    </section>`;
+  };
+
+  const offIds=Object.entries(lastRoster.assignments).filter(([id,a])=>a.status==='OFF').map(([id])=>id);
+  const offOrder=[];
+  TEAMS.forEach(t=>workers.filter(w=>offIds.includes(w.id)&&w.team===t).forEach(w=>offOrder.push(w)));
+  const offHtml=offOrder.length
+    ? `<div class="cs-off-list">${offOrder.map((w,i)=>`<div class="cs-off-item cs-${w.team.toLowerCase()}"><div class="cs-off-no">${i+1}</div><div class="cs-off-name" title="${esc(w.name)}">${esc(w.name)}</div></div>`).join('')}</div>`
+    : '<div class="cs-empty">Tidak ada worker OFF.</div>';
+
+  root.innerHTML=`<div class="callsheet-shell">
+    <div class="cs-top">
+      <div><h2 class="cs-title">WORKER — ${dateLabel(date)}</h2></div>
+      <div class="cs-top-right">
+        <div class="cs-pill ${committedDate===date?'synced':''}">${statusText}</div>
+        <div class="cs-pill">WORK ${workCount} · OFF ${offCount}</div>
+      </div>
+    </div>
+    <div class="cs-stack">
+      ${locationOrder.map(renderLocationRow).join('')}
+      <section class="cs-section">
+        <div class="cs-section-head">
+          <div class="cs-section-num">5</div>
+          <div class="cs-section-title">OFF</div>
+          <div class="cs-section-count">${offOrder.length} WORKER</div>
+        </div>
+        <div class="cs-section-body">${offHtml}</div>
+      </section>
+    </div>
+    <div class="cs-summary">
+      <div class="cs-summary-title">WORKER SUMMARY</div>
+      <div class="cs-summary-head"><div>STATUS</div><div>TOTAL WORKER</div></div>
+      <div class="cs-summary-row"><div>WORKER YANG BEKERJA</div><div>${workCount}</div></div>
+      <div class="cs-summary-row"><div>WORKER OFF</div><div>${offCount}</div></div>
+    </div>
+    <div class="cs-note">Manual edit: gunakan ikon panah di sisi kanan nama untuk memindahkan worker ke request lain dalam team yang sama. Update Master Schedule setelah callsheet final.</div>
+  </div>`;
+}
+function callWorkerRow(id,no,reqId){
+  const w=workers.find(x=>x.id===id);if(!w)return '';
+  const sameTeamReqs=requests.filter(r=>r.team===w.team&&r.id!==reqId);
+  const opts=sameTeamReqs.map(r=>`<option value="${r.id}">${esc(r.display)}</option>`).join('');
+  return `<div class="cs-worker cs-${w.team.toLowerCase()}"><div class="cs-worker-no">${no}</div><div class="cs-worker-name" title="${esc(w.name)}">${esc(w.name)}</div><div class="cs-worker-move"><select title="Move worker" onchange="moveWorker('${w.id}',${reqId},Number(this.value))"><option value="${reqId}">↕</option>${opts}</select></div></div>`;
+}
+function updateMasterSchedule(){
+  if(!lastRoster){alert('Generate roster dulu.');return}
+  const date=lastRoster.date;
+  if(committedDate===date){alert('Tanggal ini sudah di-update.');return}
+  history[date]={};Object.entries(lastRoster.assignments).forEach(([id,a])=>history[date][id]=a.status==='WORK'?'W':'O');recomputeTotals();committedDate=date;renderCallsheet();renderSchedule();refreshDashboard();renderWorkers();document.getElementById('rosterMessage').innerHTML='<div class="ok"><b>MASTER SCHEDULE UPDATED</b><div style="margin-top:5px">Roster final untuk '+dateLabel(date)+' sudah masuk ke dummy Master Schedule.</div></div>'}
+function downloadCallsheet(){if(!lastRoster){alert('Generate roster dulu.');return}const page=document.getElementById('page-callsheet');document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));page.classList.add('active');page.classList.add('print-callsheet');window.print();setTimeout(()=>{page.classList.remove('print-callsheet');openPage('callsheet')},400)}
+
+function renderSchedule(){
+  const dates=Object.keys(history).sort();
+  const current=dates.length?dates[dates.length-1]:todayKey();
+  const missingCurrent=!history[current];
+  document.getElementById('scheduleInfo').innerHTML=`<div class="grid"><div class="request-chip"><h4>DATE COLUMNS</h4><div class="sub">History dummy: ${dates.length} days${missingCurrent?' · current roster belum di-commit':''}</div></div><div class="request-chip"><h4>LAST TOTAL WORK</h4><div class="sub">Lowest TOTAL WORK per team ditampilkan bold red italic.</div></div></div>`;
+  document.getElementById('scheduleHead').innerHTML=`<tr><th class="left">WORKER ID</th><th class="left">NAME</th><th>TEAM</th><th>TOTAL WORK</th>${dates.map(d=>`<th>${dateLabel(d).slice(0,6)}</th>`).join('')}</tr>`;
+  document.getElementById('scheduleBody').innerHTML=workers.map(w=>{const low=isLowestWork(w);return `<tr class="${w.status==='INACTIVE'?'inactive-row':''}"><td class="left">${w.id}</td><td class="name">${esc(w.name)}</td><td><span class="badge ${TEAM_BADGE[w.team]}">${w.team}</span></td><td class="${low?'low-work':''}">${w.work}</td>${dates.map(d=>history[d]?.[w.id]==='W'?'<td class="work-cell">W</td>':'<td class="off-cell">O</td>').join('')}</tr>`}).join('')
+}
+function renderConflict(){
+  const box=document.getElementById('conflictBox');
+  if(!lastConflict){box.innerHTML='<div class="ok"><b>NO ACTIVE CONFLICT</b><div style="margin-top:5px">Coba TEST CONFLICT dari menu Roster untuk melihat laporan shortage lengkap.</div></div>';return}
+  let html=`<div class="conf"><b>ROSTER CONFLICT — ${dateLabel(lastConflict.date)}</b><div style="margin-top:5px">Generation dibatalkan karena demand lebih besar daripada ACTIVE capacity.</div></div>`;
+  lastConflict.items.forEach(c=>{const reqRows=c.requests.map(r=>`<tr><td>${esc(r.location)}</td><td>${esc(r.display)}</td><td>${esc(r.category)}</td><td>${r.request}</td></tr>`).join('');const inactiveNames=c.inactive.map(w=>esc(w.name)).join(', ')||'Tidak ada';html+=`<div class="box panel" style="margin-top:14px"><div class="section-title">${c.team}</div><div class="grid"><div><div class="request-chip"><h4>CAPACITY</h4><div class="sub">DEMAND <b>${c.demand}</b> · ACTIVE <b>${c.active}</b> · SHORTAGE <b>${c.remaining}</b></div></div></div><div><div class="request-chip"><h4>INACTIVE</h4><div class="sub">${inactiveNames}</div></div></div></div><div style="margin-top:14px"><b style="font:500 16px Oswald;color:var(--nav)">REQUEST BREAKDOWN</b><div class="table" style="margin-top:7px"><table class="conflict-table"><thead><tr><th>LOCATION</th><th>DISPLAY</th><th>CATEGORY</th><th>REQUEST</th></tr></thead><tbody>${reqRows}</tbody></table></div></div></div>`});box.innerHTML=html;
+}
+function resetDemo(){seedDemo();document.getElementById('rosterDate').value=iso(new Date());requests=defaultRequests();refreshDashboard();renderWorkers();renderRequests();renderCallsheet();renderSchedule();renderConflict();openPage('dashboard')}
+
+document.getElementById('rosterDate').addEventListener('change',()=>{lastRoster=null;lastConflict=null;committedDate=null;refreshDashboard();renderWorkers();renderRequests();renderCallsheet();renderConflict()});
+document.getElementById('rosterDate').value=iso(new Date());seedDemo();refreshDashboard();renderWorkers();renderRequests();renderCallsheet();renderSchedule();renderConflict();
+</script>
 </body>
 </html>
