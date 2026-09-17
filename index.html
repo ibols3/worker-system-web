@@ -3,139 +3,692 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Worker System</title>
 
   <style>
+
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f7fb;
-      color: #222;
+      color: #1f2937;
     }
 
-    .header {
+    /* ==============================
+       SIDEBAR
+    ============================== */
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+
+      width: 240px;
+      height: 100vh;
+
       background: #0b5394;
       color: white;
-      padding: 24px 32px;
+
+      padding: 28px 18px;
     }
 
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
+    .brand {
+      font-size: 24px;
+      font-weight: 800;
+
+      padding: 0 12px 30px;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 0 20px;
+    .brand span {
+      display: block;
+      font-size: 11px;
+      font-weight: normal;
+
+      margin-top: 5px;
+
+      opacity: .7;
+      letter-spacing: 1px;
     }
 
-    .dashboard {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .card {
-      background: white;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,.08);
-    }
+    .menu button {
+      width: 100%;
 
-    .card h3 {
-      margin-top: 0;
-    }
+      border: none;
+      background: transparent;
 
-    .number {
-      font-size: 34px;
+      color: white;
+
+      text-align: left;
+
+      padding: 13px 14px;
+
+      border-radius: 10px;
+
+      font-size: 14px;
       font-weight: bold;
+
+      cursor: pointer;
+
+      transition: .2s;
+    }
+
+    .menu button:hover {
+      background: rgba(255,255,255,.12);
+    }
+
+    .menu button.active {
+      background: white;
       color: #0b5394;
     }
 
-    .actions {
-      margin-top: 30px;
+
+    /* ==============================
+       MAIN
+    ============================== */
+
+    .main {
+      margin-left: 240px;
+
+      min-height: 100vh;
+
+      padding: 30px 34px;
+    }
+
+
+    /* ==============================
+       TOP BAR
+    ============================== */
+
+    .topbar {
       display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 30px;
     }
 
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 16px 24px;
-      font-size: 16px;
+    .page-title h1 {
+      font-size: 30px;
+      color: #0b5394;
+    }
+
+    .page-title p {
+      margin-top: 5px;
+
+      color: #6b7280;
+
+      font-size: 14px;
+    }
+
+    .date-box {
+      background: white;
+
+      padding: 12px 18px;
+
+      border-radius: 10px;
+
+      box-shadow: 0 3px 12px rgba(0,0,0,.06);
+
       font-weight: bold;
+    }
+
+
+    /* ==============================
+       STATS
+    ============================== */
+
+    .stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 18px;
+
+      margin-bottom: 25px;
+    }
+
+    .stat {
+      background: white;
+
+      border-radius: 16px;
+
+      padding: 22px;
+
+      box-shadow: 0 5px 18px rgba(0,0,0,.06);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #6b7280;
+
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 34px;
+      font-weight: 800;
+
+      color: #0b5394;
+    }
+
+
+    /* ==============================
+       TEAM CARDS
+    ============================== */
+
+    .section-title {
+      font-size: 18px;
+
+      margin: 30px 0 14px;
+
+      color: #111827;
+    }
+
+    .teams {
+      display: grid;
+
+      grid-template-columns:
+        repeat(5, 1fr);
+
+      gap: 14px;
+    }
+
+    .team-card {
+      border-radius: 14px;
+
+      overflow: hidden;
+
+      background: white;
+
+      box-shadow: 0 4px 15px rgba(0,0,0,.06);
+    }
+
+    .team-head {
+      padding: 12px;
+
+      font-weight: 800;
+
+      text-align: center;
+    }
+
+    .team-body {
+      padding: 16px;
+
+      text-align: center;
+    }
+
+    .team-number {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .team-label {
+      margin-top: 4px;
+
+      color: #6b7280;
+
+      font-size: 12px;
+    }
+
+
+    .red .team-head {
+      background: #ff0000;
+    }
+
+    .orange .team-head {
+      background: #ff9900;
+    }
+
+    .yellow .team-head {
+      background: #ffff00;
+    }
+
+    .blue .team-head {
+      background: #00ffff;
+    }
+
+    .green .team-head {
+      background: #00ff00;
+    }
+
+
+    /* ==============================
+       QUICK ACTIONS
+    ============================== */
+
+    .actions {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 18px;
+    }
+
+    .action {
+      border: none;
+
+      background: white;
+
+      border-radius: 16px;
+
+      padding: 24px;
+
+      text-align: left;
+
+      box-shadow: 0 4px 15px rgba(0,0,0,.06);
+
       cursor: pointer;
-      background: #0b5394;
-      color: white;
+
+      transition: .2s;
     }
 
-    button:hover {
-      opacity: .9;
+    .action:hover {
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 8px 20px rgba(0,0,0,.1);
     }
 
-    @media (max-width: 800px) {
-      .dashboard {
-        grid-template-columns: repeat(2, 1fr);
+    .action h3 {
+      margin-bottom: 8px;
+
+      color: #0b5394;
+    }
+
+    .action p {
+      color: #6b7280;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+
+    /* ==============================
+       RESPONSIVE
+    ============================== */
+
+    @media(max-width: 1000px) {
+
+      .stats {
+        grid-template-columns:
+          repeat(2, 1fr);
       }
+
+      .teams {
+        grid-template-columns:
+          repeat(3, 1fr);
+      }
+
+      .actions {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
     }
+
+    @media(max-width: 700px) {
+
+      .sidebar {
+        position: relative;
+
+        width: 100%;
+        height: auto;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .stats,
+      .teams,
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
   </style>
 </head>
 
+
 <body>
 
-  <div class="header">
-    <h1>WORKER SYSTEM</h1>
-  </div>
 
-  <div class="container">
+  <!-- ==========================
+       SIDEBAR
+  =========================== -->
 
-    <div class="dashboard">
+  <aside class="sidebar">
 
-      <div class="card">
-        <h3>TOTAL WORKER</h3>
-        <div class="number">57</div>
+    <div class="brand">
+
+      WORKER SYSTEM
+
+      <span>
+        Production Management
+      </span>
+
+    </div>
+
+
+    <div class="menu">
+
+      <button class="active">
+        Dashboard
+      </button>
+
+      <button>
+        Master Data
+      </button>
+
+      <button>
+        Roster
+      </button>
+
+      <button>
+        Callsheet
+      </button>
+
+      <button>
+        Master Schedule
+      </button>
+
+      <button>
+        Conflict Report
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ==========================
+       MAIN
+  =========================== -->
+
+  <main class="main">
+
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+      <div class="page-title">
+
+        <h1>
+          Dashboard
+        </h1>
+
+        <p>
+          Worker management system
+        </p>
+
       </div>
 
-      <div class="card">
-        <h3>ACTIVE</h3>
-        <div class="number">57</div>
-      </div>
 
-      <div class="card">
-        <h3>INACTIVE</h3>
-        <div class="number">0</div>
-      </div>
+      <div class="date-box">
 
-      <div class="card">
-        <h3>TODAY</h3>
-        <div class="number">25</div>
+        25 November 2026
+
       </div>
 
     </div>
+
+
+    <!-- ==========================
+         GENERAL STATS
+    =========================== -->
+
+    <div class="stats">
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          TOTAL WORKER
+        </div>
+
+        <div class="stat-value">
+          57
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          ACTIVE
+        </div>
+
+        <div class="stat-value">
+          57
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          INACTIVE
+        </div>
+
+        <div class="stat-value">
+          0
+        </div>
+
+      </div>
+
+
+      <div class="stat">
+
+        <div class="stat-label">
+          TODAY WORKER
+        </div>
+
+        <div class="stat-value">
+          44
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==========================
+         TEAM
+    =========================== -->
+
+    <h2 class="section-title">
+      WORKER TEAM
+    </h2>
+
+
+    <div class="teams">
+
+
+      <div class="team-card red">
+
+        <div class="team-head">
+          RED
+        </div>
+
+        <div class="team-body">
+
+          <div class="team-number">
+            28
+          </div>
+
+          <div class="team-label">
+            WORKERS
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="team-card orange">
+
+        <div class="team-head">
+          ORANGE
+        </div>
+
+        <div class="team-body">
+
+          <div class="team-number">
+            8
+          </div>
+
+          <div class="team-label">
+            WORKERS
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="team-card yellow">
+
+        <div class="team-head">
+          YELLOW
+        </div>
+
+        <div class="team-body">
+
+          <div class="team-number">
+            7
+          </div>
+
+          <div class="team-label">
+            WORKERS
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="team-card blue">
+
+        <div class="team-head">
+          BLUE
+        </div>
+
+        <div class="team-body">
+
+          <div class="team-number">
+            8
+          </div>
+
+          <div class="team-label">
+            WORKERS
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="team-card green">
+
+        <div class="team-head">
+          GREEN
+        </div>
+
+        <div class="team-body">
+
+          <div class="team-number">
+            6
+          </div>
+
+          <div class="team-label">
+            WORKERS
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==========================
+         QUICK ACTIONS
+    =========================== -->
+
+    <h2 class="section-title">
+      QUICK ACTION
+    </h2>
+
 
     <div class="actions">
 
-      <button onclick="alert('Roster Generator')">
-        GENERATE ROSTER
+
+      <button class="action">
+
+        <h3>
+          Generate Roster
+        </h3>
+
+        <p>
+          Generate worker assignment
+          berdasarkan kebutuhan hari ini.
+        </p>
+
       </button>
 
-      <button onclick="alert('Callsheet')">
-        CALLSHEET
+
+      <button class="action">
+
+        <h3>
+          Create Callsheet
+        </h3>
+
+        <p>
+          Buat callsheet berdasarkan roster
+          yang sudah dibuat.
+        </p>
+
       </button>
 
-      <button onclick="alert('Master Schedule')">
-        MASTER SCHEDULE
+
+      <button class="action">
+
+        <h3>
+          Conflict Report
+        </h3>
+
+        <p>
+          Cek kebutuhan worker yang tidak
+          dapat dipenuhi.
+        </p>
+
       </button>
+
 
     </div>
 
-  </div>
+
+  </main>
+
 
 </body>
 </html>
