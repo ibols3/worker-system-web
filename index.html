@@ -2,11 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Worker System</title>
 
+  <link
+    href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
   <style>
+
+    :root {
+      --blue-dark: #0b5394;
+      --blue: #3d85c6;
+      --bg: #f4f7fb;
+      --white: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dbe3ec;
+
+      --red: #ff0000;
+      --red-soft: #f4cccc;
+
+      --orange: #ff9900;
+      --orange-soft: #fce5cd;
+
+      --yellow: #ffff00;
+      --yellow-soft: #fff2cc;
+
+      --cyan: #00ffff;
+      --cyan-soft: #cfe2f3;
+
+      --green: #00ff00;
+      --green-soft: #d9ead3;
+
+      --danger: #c00000;
+    }
 
     * {
       box-sizing: border-box;
@@ -15,45 +50,58 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #1f2937;
+      font-family: "Inter", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    /* ==============================
+    button,
+    input,
+    select {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* =========================================
        SIDEBAR
-    ============================== */
+    ========================================= */
 
     .sidebar {
       position: fixed;
       left: 0;
       top: 0;
 
-      width: 240px;
+      width: 245px;
       height: 100vh;
 
-      background: #0b5394;
+      background: var(--blue-dark);
       color: white;
 
-      padding: 28px 18px;
+      padding: 26px 16px;
+
+      z-index: 1000;
     }
 
     .brand {
-      font-size: 24px;
-      font-weight: 800;
-
-      padding: 0 12px 30px;
+      padding: 0 12px 28px;
     }
 
-    .brand span {
-      display: block;
+    .brand-title {
+      font-family: "Oswald", sans-serif;
+      font-size: 27px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+    }
+
+    .brand-subtitle {
+      margin-top: 4px;
       font-size: 11px;
-      font-weight: normal;
-
-      margin-top: 5px;
-
+      letter-spacing: 1.4px;
       opacity: .7;
-      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .menu {
@@ -62,7 +110,7 @@
       gap: 6px;
     }
 
-    .menu button {
+    .menu-button {
       width: 100%;
 
       border: none;
@@ -70,294 +118,652 @@
 
       color: white;
 
-      text-align: left;
-
       padding: 13px 14px;
 
-      border-radius: 10px;
+      border-radius: 11px;
+
+      text-align: left;
 
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 700;
 
-      cursor: pointer;
-
-      transition: .2s;
+      transition: .2s ease;
     }
 
-    .menu button:hover {
+    .menu-button:hover {
       background: rgba(255,255,255,.12);
     }
 
-    .menu button.active {
+    .menu-button.active {
       background: white;
-      color: #0b5394;
+      color: var(--blue-dark);
     }
 
-
-    /* ==============================
+    /* =========================================
        MAIN
-    ============================== */
+    ========================================= */
 
     .main {
-      margin-left: 240px;
-
+      margin-left: 245px;
       min-height: 100vh;
-
       padding: 30px 34px;
     }
 
-
-    /* ==============================
-       TOP BAR
-    ============================== */
+    /* =========================================
+       PAGE HEADER
+    ========================================= */
 
     .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
 
-      margin-bottom: 30px;
+      margin-bottom: 28px;
     }
 
     .page-title h1 {
-      font-size: 30px;
-      color: #0b5394;
+      font-family: "Oswald", sans-serif;
+      font-size: 34px;
+      font-weight: 600;
+      color: var(--blue-dark);
+      letter-spacing: .4px;
     }
 
     .page-title p {
-      margin-top: 5px;
-
-      color: #6b7280;
-
-      font-size: 14px;
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--muted);
     }
 
     .date-box {
       background: white;
 
-      padding: 12px 18px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
 
-      border-radius: 10px;
+      padding: 12px 17px;
 
-      box-shadow: 0 3px 12px rgba(0,0,0,.06);
+      font-size: 13px;
+      font-weight: 700;
 
-      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,.04);
     }
 
+    /* =========================================
+       PAGE SYSTEM
+    ========================================= */
 
-    /* ==============================
-       STATS
-    ============================== */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* =========================================
+       DASHBOARD
+    ========================================= */
 
     .stats {
       display: grid;
-
-      grid-template-columns:
-        repeat(4, 1fr);
-
+      grid-template-columns: repeat(4, 1fr);
       gap: 18px;
-
-      margin-bottom: 25px;
+      margin-bottom: 28px;
     }
 
-    .stat {
+    .stat-card {
       background: white;
+      border-radius: 17px;
+      padding: 21px;
 
-      border-radius: 16px;
+      border: 1px solid #e4eaf1;
 
-      padding: 22px;
-
-      box-shadow: 0 5px 18px rgba(0,0,0,.06);
+      box-shadow: 0 5px 18px rgba(0,0,0,.05);
     }
 
     .stat-label {
-      font-size: 13px;
-      color: #6b7280;
-
-      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .3px;
     }
 
     .stat-value {
-      font-size: 34px;
-      font-weight: 800;
+      margin-top: 9px;
 
-      color: #0b5394;
+      font-family: "Oswald", sans-serif;
+      font-size: 38px;
+      font-weight: 600;
+
+      color: var(--blue-dark);
     }
 
-
-    /* ==============================
-       TEAM CARDS
-    ============================== */
-
     .section-title {
-      font-size: 18px;
+      margin: 26px 0 14px;
 
-      margin: 30px 0 14px;
-
+      font-family: "Oswald", sans-serif;
+      font-size: 21px;
+      font-weight: 600;
       color: #111827;
     }
 
     .teams {
       display: grid;
-
-      grid-template-columns:
-        repeat(5, 1fr);
-
+      grid-template-columns: repeat(5, 1fr);
       gap: 14px;
     }
 
     .team-card {
-      border-radius: 14px;
-
+      background: white;
+      border-radius: 15px;
       overflow: hidden;
 
-      background: white;
+      border: 1px solid #e4eaf1;
 
-      box-shadow: 0 4px 15px rgba(0,0,0,.06);
+      box-shadow: 0 4px 15px rgba(0,0,0,.05);
     }
 
-    .team-head {
-      padding: 12px;
-
-      font-weight: 800;
-
+    .team-header {
       text-align: center;
+      padding: 11px 12px;
+
+      font-family: "Oswald", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
     }
 
     .team-body {
-      padding: 16px;
-
       text-align: center;
+      padding: 17px;
     }
 
     .team-number {
-      font-size: 28px;
-      font-weight: 800;
+      font-family: "Oswald", sans-serif;
+      font-size: 31px;
+      font-weight: 600;
     }
 
     .team-label {
-      margin-top: 4px;
-
-      color: #6b7280;
-
-      font-size: 12px;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
     }
 
-
-    .red .team-head {
-      background: #ff0000;
+    .team-red .team-header {
+      background: var(--red);
     }
 
-    .orange .team-head {
-      background: #ff9900;
+    .team-orange .team-header {
+      background: var(--orange);
     }
 
-    .yellow .team-head {
-      background: #ffff00;
+    .team-yellow .team-header {
+      background: var(--yellow);
     }
 
-    .blue .team-head {
-      background: #00ffff;
+    .team-blue .team-header {
+      background: var(--cyan);
     }
 
-    .green .team-head {
-      background: #00ff00;
+    .team-green .team-header {
+      background: var(--green);
     }
 
-
-    /* ==============================
-       QUICK ACTIONS
-    ============================== */
-
-    .actions {
+    .quick-actions {
       display: grid;
-
-      grid-template-columns:
-        repeat(3, 1fr);
-
-      gap: 18px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
 
-    .action {
-      border: none;
-
+    .action-card {
+      border: 1px solid #e4eaf1;
       background: white;
 
-      border-radius: 16px;
-
-      padding: 24px;
+      border-radius: 15px;
+      padding: 20px;
 
       text-align: left;
 
-      box-shadow: 0 4px 15px rgba(0,0,0,.06);
-
-      cursor: pointer;
-
-      transition: .2s;
+      transition: .2s ease;
     }
 
-    .action:hover {
+    .action-card:hover {
       transform: translateY(-2px);
-
-      box-shadow:
-        0 8px 20px rgba(0,0,0,.1);
+      box-shadow: 0 8px 20px rgba(0,0,0,.08);
     }
 
-    .action h3 {
-      margin-bottom: 8px;
-
-      color: #0b5394;
+    .action-card h3 {
+      font-family: "Oswald", sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--blue-dark);
+      margin-bottom: 7px;
     }
 
-    .action p {
-      color: #6b7280;
+    .action-card p {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    /* =========================================
+       MASTER DATA
+    ========================================= */
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+
+      margin-bottom: 18px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      min-width: 280px;
+
+      background: white;
+      border: 1px solid var(--border);
+
+      border-radius: 11px;
+
+      padding: 12px 14px;
+
+      outline: none;
+
+      font-size: 13px;
+    }
+
+    .search-box:focus {
+      border-color: var(--blue);
+    }
+
+    .filter-select {
+      background: white;
+      border: 1px solid var(--border);
+
+      border-radius: 11px;
+
+      padding: 12px 14px;
 
       font-size: 13px;
 
-      line-height: 1.5;
+      outline: none;
     }
 
+    .primary-button {
+      border: none;
 
-    /* ==============================
+      background: var(--blue-dark);
+      color: white;
+
+      border-radius: 11px;
+
+      padding: 12px 18px;
+
+      font-size: 13px;
+      font-weight: 800;
+
+      transition: .2s ease;
+    }
+
+    .primary-button:hover {
+      background: #084477;
+    }
+
+    .data-card {
+      background: white;
+
+      border: 1px solid #e1e8f0;
+
+      border-radius: 16px;
+
+      overflow: hidden;
+
+      box-shadow: 0 5px 18px rgba(0,0,0,.05);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 750px;
+    }
+
+    thead {
+      background: var(--blue-dark);
+      color: white;
+    }
+
+    th {
+      padding: 14px 15px;
+      text-align: left;
+
+      font-family: "Oswald", sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: .3px;
+    }
+
+    td {
+      padding: 13px 15px;
+
+      border-bottom: 1px solid #edf1f5;
+
+      font-size: 13px;
+    }
+
+    tbody tr:hover {
+      background: #f8fbff;
+    }
+
+    .worker-name {
+      font-weight: 700;
+    }
+
+    .worker-id {
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .inactive-row td {
+      color: #9099a6;
+      text-decoration: line-through;
+    }
+
+    .inactive-row .team-badge,
+    .inactive-row .status-badge {
+      text-decoration: none;
+      opacity: .6;
+    }
+
+    /* =========================================
+       TEAM BADGE
+    ========================================= */
+
+    .team-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      min-width: 78px;
+
+      border-radius: 7px;
+
+      padding: 6px 9px;
+
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .badge-red {
+      background: var(--red-soft);
+      color: #8f0000;
+    }
+
+    .badge-orange {
+      background: var(--orange-soft);
+      color: #9a5600;
+    }
+
+    .badge-yellow {
+      background: var(--yellow-soft);
+      color: #8a7800;
+    }
+
+    .badge-blue {
+      background: var(--cyan-soft);
+      color: #075879;
+    }
+
+    .badge-green {
+      background: var(--green-soft);
+      color: #2b6e31;
+    }
+
+    /* =========================================
+       STATUS BADGE
+    ========================================= */
+
+    .status-badge {
+      display: inline-flex;
+
+      align-items: center;
+      justify-content: center;
+
+      min-width: 82px;
+
+      padding: 6px 10px;
+
+      border-radius: 20px;
+
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .status-active {
+      background: #d9ead3;
+      color: #2b6e31;
+    }
+
+    .status-inactive {
+      background: #eeeeee;
+      color: #777777;
+    }
+
+    .action-small {
+      border: 1px solid #d8e1eb;
+      background: white;
+
+      padding: 7px 11px;
+
+      border-radius: 8px;
+
+      font-size: 11px;
+      font-weight: 800;
+
+      color: var(--blue-dark);
+    }
+
+    .action-small:hover {
+      background: #f1f7ff;
+    }
+
+    /* =========================================
+       MODAL
+    ========================================= */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+
+      background: rgba(11, 83, 148, .30);
+
+      display: none;
+      align-items: center;
+      justify-content: center;
+
+      z-index: 3000;
+
+      padding: 20px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 500px;
+
+      background: white;
+
+      border-radius: 18px;
+
+      box-shadow: 0 20px 50px rgba(0,0,0,.18);
+
+      overflow: hidden;
+    }
+
+    .modal-header {
+      background: var(--blue-dark);
+      color: white;
+
+      padding: 18px 20px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      font-family: "Oswald", sans-serif;
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      color: white;
+
+      font-size: 23px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+
+      margin-bottom: 7px;
+
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+
+      border: 1px solid var(--border);
+
+      border-radius: 10px;
+
+      padding: 11px 12px;
+
+      outline: none;
+
+      font-size: 13px;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--blue);
+    }
+
+    .modal-footer {
+      padding: 15px 22px;
+
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+
+      border-top: 1px solid #edf1f5;
+    }
+
+    .secondary-button {
+      border: 1px solid #d7e0ea;
+
+      background: white;
+
+      padding: 11px 17px;
+
+      border-radius: 10px;
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* =========================================
+       EMPTY
+    ========================================= */
+
+    .empty {
+      padding: 50px 20px;
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 14px;
+    }
+
+    /* =========================================
        RESPONSIVE
-    ============================== */
+    ========================================= */
 
-    @media(max-width: 1000px) {
+    @media (max-width: 1100px) {
 
       .stats {
-        grid-template-columns:
-          repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .teams {
-        grid-template-columns:
-          repeat(3, 1fr);
+        grid-template-columns: repeat(3, 1fr);
       }
 
-      .actions {
-        grid-template-columns:
-          repeat(2, 1fr);
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
       }
 
     }
 
-    @media(max-width: 700px) {
+    @media (max-width: 760px) {
 
       .sidebar {
         position: relative;
-
         width: 100%;
         height: auto;
       }
 
       .main {
         margin-left: 0;
+        padding: 20px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 15px;
       }
 
       .stats,
       .teams,
-      .actions {
+      .quick-actions {
         grid-template-columns: 1fr;
+      }
+
+      .search-box {
+        min-width: 100%;
       }
 
     }
@@ -365,178 +771,158 @@
   </style>
 </head>
 
-
 <body>
 
-
-  <!-- ==========================
+  <!-- ==========================================
        SIDEBAR
-  =========================== -->
+  =========================================== -->
 
   <aside class="sidebar">
 
     <div class="brand">
+      <div class="brand-title">
+        WORKER SYSTEM
+      </div>
 
-      WORKER SYSTEM
-
-      <span>
+      <div class="brand-subtitle">
         Production Management
-      </span>
-
+      </div>
     </div>
 
+    <nav class="menu">
 
-    <div class="menu">
-
-      <button class="active">
+      <button
+        class="menu-button active"
+        data-page="dashboard"
+      >
         Dashboard
       </button>
 
-      <button>
+      <button
+        class="menu-button"
+        data-page="master-data"
+      >
         Master Data
       </button>
 
-      <button>
+      <button
+        class="menu-button"
+        data-page="roster"
+      >
         Roster
       </button>
 
-      <button>
+      <button
+        class="menu-button"
+        data-page="callsheet"
+      >
         Callsheet
       </button>
 
-      <button>
+      <button
+        class="menu-button"
+        data-page="schedule"
+      >
         Master Schedule
       </button>
 
-      <button>
+      <button
+        class="menu-button"
+        data-page="conflict"
+      >
         Conflict Report
       </button>
 
-    </div>
+    </nav>
 
   </aside>
 
 
-  <!-- ==========================
+  <!-- ==========================================
        MAIN
-  =========================== -->
+  =========================================== -->
 
   <main class="main">
 
+    <!-- ========================================
+         DASHBOARD
+    ========================================= -->
 
-    <!-- TOP BAR -->
+    <section
+      class="page active"
+      id="page-dashboard"
+    >
 
-    <div class="topbar">
+      <div class="topbar">
 
-      <div class="page-title">
+        <div class="page-title">
 
-        <h1>
-          Dashboard
-        </h1>
+          <h1>
+            Dashboard
+          </h1>
 
-        <p>
-          Worker management system
-        </p>
+          <p>
+            Worker management system
+          </p>
 
-      </div>
-
-
-      <div class="date-box">
-
-        25 November 2026
-
-      </div>
-
-    </div>
-
-
-    <!-- ==========================
-         GENERAL STATS
-    =========================== -->
-
-    <div class="stats">
-
-
-      <div class="stat">
-
-        <div class="stat-label">
-          TOTAL WORKER
         </div>
 
-        <div class="stat-value">
-          57
+        <div class="date-box">
+          25 November 2026
         </div>
 
       </div>
 
 
-      <div class="stat">
+      <div class="stats">
 
-        <div class="stat-label">
-          ACTIVE
-        </div>
+        <div class="stat-card">
 
-        <div class="stat-value">
-          57
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-label">
-          INACTIVE
-        </div>
-
-        <div class="stat-value">
-          0
-        </div>
-
-      </div>
-
-
-      <div class="stat">
-
-        <div class="stat-label">
-          TODAY WORKER
-        </div>
-
-        <div class="stat-value">
-          44
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- ==========================
-         TEAM
-    =========================== -->
-
-    <h2 class="section-title">
-      WORKER TEAM
-    </h2>
-
-
-    <div class="teams">
-
-
-      <div class="team-card red">
-
-        <div class="team-head">
-          RED
-        </div>
-
-        <div class="team-body">
-
-          <div class="team-number">
-            28
+          <div class="stat-label">
+            TOTAL WORKER
           </div>
 
-          <div class="team-label">
-            WORKERS
+          <div class="stat-value">
+            57
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-label">
+            ACTIVE
+          </div>
+
+          <div class="stat-value">
+            57
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-label">
+            INACTIVE
+          </div>
+
+          <div class="stat-value">
+            0
+          </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+          <div class="stat-label">
+            TODAY WORKER
+          </div>
+
+          <div class="stat-value">
+            44
           </div>
 
         </div>
@@ -544,20 +930,113 @@
       </div>
 
 
-      <div class="team-card orange">
+      <h2 class="section-title">
+        WORKER TEAM
+      </h2>
 
-        <div class="team-head">
-          ORANGE
-        </div>
 
-        <div class="team-body">
+      <div class="teams">
 
-          <div class="team-number">
-            8
+        <div class="team-card team-red">
+
+          <div class="team-header">
+            RED
           </div>
 
-          <div class="team-label">
-            WORKERS
+          <div class="team-body">
+
+            <div class="team-number">
+              28
+            </div>
+
+            <div class="team-label">
+              WORKERS
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="team-card team-orange">
+
+          <div class="team-header">
+            ORANGE
+          </div>
+
+          <div class="team-body">
+
+            <div class="team-number">
+              8
+            </div>
+
+            <div class="team-label">
+              WORKERS
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="team-card team-yellow">
+
+          <div class="team-header">
+            YELLOW
+          </div>
+
+          <div class="team-body">
+
+            <div class="team-number">
+              7
+            </div>
+
+            <div class="team-label">
+              WORKERS
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="team-card team-blue">
+
+          <div class="team-header">
+            BLUE
+          </div>
+
+          <div class="team-body">
+
+            <div class="team-number">
+              8
+            </div>
+
+            <div class="team-label">
+              WORKERS
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="team-card team-green">
+
+          <div class="team-header">
+            GREEN
+          </div>
+
+          <div class="team-body">
+
+            <div class="team-number">
+              6
+            </div>
+
+            <div class="team-label">
+              WORKERS
+            </div>
+
           </div>
 
         </div>
@@ -565,130 +1044,1210 @@
       </div>
 
 
-      <div class="team-card yellow">
+      <h2 class="section-title">
+        QUICK ACTION
+      </h2>
 
-        <div class="team-head">
-          YELLOW
+
+      <div class="quick-actions">
+
+        <button
+          class="action-card"
+          onclick="openPage('roster')"
+        >
+
+          <h3>
+            Generate Roster
+          </h3>
+
+          <p>
+            Generate worker assignment
+            berdasarkan kebutuhan hari ini.
+          </p>
+
+        </button>
+
+
+        <button
+          class="action-card"
+          onclick="openPage('callsheet')"
+        >
+
+          <h3>
+            Create Callsheet
+          </h3>
+
+          <p>
+            Buat callsheet berdasarkan roster
+            yang sudah dibuat.
+          </p>
+
+        </button>
+
+
+        <button
+          class="action-card"
+          onclick="openPage('conflict')"
+        >
+
+          <h3>
+            Conflict Report
+          </h3>
+
+          <p>
+            Cek kebutuhan worker yang tidak
+            dapat dipenuhi.
+          </p>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         MASTER DATA
+    ========================================= -->
+
+    <section
+      class="page"
+      id="page-master-data"
+    >
+
+      <div class="topbar">
+
+        <div class="page-title">
+
+          <h1>
+            Master Data
+          </h1>
+
+          <p>
+            Worker database
+          </p>
+
         </div>
 
-        <div class="team-body">
+        <button
+          class="primary-button"
+          onclick="openWorkerModal()"
+        >
+          + ADD WORKER
+        </button>
 
-          <div class="team-number">
-            7
-          </div>
+      </div>
 
-          <div class="team-label">
-            WORKERS
-          </div>
+
+      <div class="toolbar">
+
+        <div class="toolbar-left">
+
+          <input
+            type="text"
+            class="search-box"
+            id="workerSearch"
+            placeholder="Search worker ID or name..."
+          >
+
+          <select
+            class="filter-select"
+            id="teamFilter"
+          >
+
+            <option value="ALL">
+              ALL TEAM
+            </option>
+
+            <option value="RED">
+              RED
+            </option>
+
+            <option value="ORANGE">
+              ORANGE
+            </option>
+
+            <option value="YELLOW">
+              YELLOW
+            </option>
+
+            <option value="BLUE">
+              BLUE
+            </option>
+
+            <option value="GREEN">
+              GREEN
+            </option>
+
+          </select>
+
+
+          <select
+            class="filter-select"
+            id="statusFilter"
+          >
+
+            <option value="ALL">
+              ALL STATUS
+            </option>
+
+            <option value="ACTIVE">
+              ACTIVE
+            </option>
+
+            <option value="INACTIVE">
+              INACTIVE
+            </option>
+
+          </select>
 
         </div>
 
       </div>
 
 
-      <div class="team-card blue">
+      <div class="data-card">
 
-        <div class="team-head">
-          BLUE
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>WORKER ID</th>
+                <th>NAME</th>
+                <th>STATUS</th>
+                <th>TEAM</th>
+                <th>WORK COUNT</th>
+                <th>ACTION</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="workerTableBody">
+            </tbody>
+
+          </table>
+
         </div>
 
-        <div class="team-body">
+      </div>
 
-          <div class="team-number">
-            8
-          </div>
+    </section>
 
-          <div class="team-label">
-            WORKERS
-          </div>
+
+    <!-- ========================================
+         ROSTER
+    ========================================= -->
+
+    <section
+      class="page"
+      id="page-roster"
+    >
+
+      <div class="topbar">
+
+        <div class="page-title">
+
+          <h1>
+            Roster
+          </h1>
+
+          <p>
+            Roster generator
+          </p>
 
         </div>
 
       </div>
 
 
-      <div class="team-card green">
+      <div class="data-card">
 
-        <div class="team-head">
-          GREEN
-        </div>
+        <div
+          style="
+            padding:35px;
+            text-align:center;
+          "
+        >
 
-        <div class="team-body">
+          <h2
+            style="
+              font-family:Oswald;
+              color:#0b5394;
+              margin-bottom:10px;
+            "
+          >
+            ROSTER GENERATOR
+          </h2>
 
-          <div class="team-number">
-            6
-          </div>
+          <p
+            style="
+              color:#6b7280;
+              margin-bottom:20px;
+            "
+          >
+            Halaman roster akan kita sambungkan
+            ke Google Sheets pada tahap berikutnya.
+          </p>
 
-          <div class="team-label">
-            WORKERS
-          </div>
+          <button
+            class="primary-button"
+            onclick="alert('Roster engine akan disambungkan nanti.')"
+          >
+            GENERATE ROSTER
+          </button>
 
         </div>
 
       </div>
 
-    </div>
+    </section>
 
 
-    <!-- ==========================
-         QUICK ACTIONS
-    =========================== -->
+    <!-- ========================================
+         CALLSHEET
+    ========================================= -->
 
-    <h2 class="section-title">
-      QUICK ACTION
-    </h2>
+    <section
+      class="page"
+      id="page-callsheet"
+    >
 
+      <div class="topbar">
 
-    <div class="actions">
+        <div class="page-title">
 
+          <h1>
+            Callsheet
+          </h1>
 
-      <button class="action">
+          <p>
+            Worker callsheet
+          </p>
 
-        <h3>
-          Generate Roster
-        </h3>
+        </div>
 
-        <p>
-          Generate worker assignment
-          berdasarkan kebutuhan hari ini.
-        </p>
-
-      </button>
-
-
-      <button class="action">
-
-        <h3>
-          Create Callsheet
-        </h3>
-
-        <p>
-          Buat callsheet berdasarkan roster
-          yang sudah dibuat.
-        </p>
-
-      </button>
+      </div>
 
 
-      <button class="action">
+      <div class="data-card">
 
-        <h3>
-          Conflict Report
-        </h3>
+        <div
+          style="
+            padding:35px;
+            text-align:center;
+          "
+        >
 
-        <p>
-          Cek kebutuhan worker yang tidak
-          dapat dipenuhi.
-        </p>
+          <h2
+            style="
+              font-family:Oswald;
+              color:#0b5394;
+              margin-bottom:10px;
+            "
+          >
+            CALLSHEET
+          </h2>
 
-      </button>
+          <p
+            style="
+              color:#6b7280;
+            "
+          >
+            Preview callsheet akan kita bangun
+            setelah UI utama selesai.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
 
 
-    </div>
+    <!-- ========================================
+         MASTER SCHEDULE
+    ========================================= -->
 
+    <section
+      class="page"
+      id="page-schedule"
+    >
+
+      <div class="topbar">
+
+        <div class="page-title">
+
+          <h1>
+            Master Schedule
+          </h1>
+
+          <p>
+            Worker history
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="data-card">
+
+        <div
+          style="
+            padding:35px;
+            text-align:center;
+          "
+        >
+
+          <h2
+            style="
+              font-family:Oswald;
+              color:#0b5394;
+              margin-bottom:10px;
+            "
+          >
+            MASTER SCHEDULE
+          </h2>
+
+          <p
+            style="
+              color:#6b7280;
+            "
+          >
+            History W/O akan kita tampilkan di
+            tahap berikutnya.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         CONFLICT
+    ========================================= -->
+
+    <section
+      class="page"
+      id="page-conflict"
+    >
+
+      <div class="topbar">
+
+        <div class="page-title">
+
+          <h1>
+            Conflict Report
+          </h1>
+
+          <p>
+            Roster conflict monitoring
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="data-card">
+
+        <div
+          style="
+            padding:35px;
+            text-align:center;
+          "
+        >
+
+          <h2
+            style="
+              font-family:Oswald;
+              color:#c00000;
+              margin-bottom:10px;
+            "
+          >
+            NO CONFLICT
+          </h2>
+
+          <p
+            style="
+              color:#6b7280;
+            "
+          >
+            Tidak ada conflict aktif.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
 
   </main>
 
+
+  <!-- ==========================================
+       WORKER MODAL
+  =========================================== -->
+
+  <div
+    class="modal-backdrop"
+    id="workerModal"
+  >
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <h2 id="modalTitle">
+          ADD WORKER
+        </h2>
+
+        <button
+          class="modal-close"
+          onclick="closeWorkerModal()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="modal-body">
+
+        <div class="form-group">
+
+          <label class="form-label">
+            WORKER ID
+          </label>
+
+          <input
+            class="form-input"
+            id="workerIdInput"
+            placeholder="W001"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label class="form-label">
+            NAME
+          </label>
+
+          <input
+            class="form-input"
+            id="workerNameInput"
+            placeholder="Worker name"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label class="form-label">
+            STATUS
+          </label>
+
+          <select
+            class="form-select"
+            id="workerStatusInput"
+          >
+
+            <option value="ACTIVE">
+              ACTIVE
+            </option>
+
+            <option value="INACTIVE">
+              INACTIVE
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label class="form-label">
+            TEAM
+          </label>
+
+          <select
+            class="form-select"
+            id="workerTeamInput"
+          >
+
+            <option value="RED">
+              RED
+            </option>
+
+            <option value="ORANGE">
+              ORANGE
+            </option>
+
+            <option value="YELLOW">
+              YELLOW
+            </option>
+
+            <option value="BLUE">
+              BLUE
+            </option>
+
+            <option value="GREEN">
+              GREEN
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <div class="modal-footer">
+
+        <button
+          class="secondary-button"
+          onclick="closeWorkerModal()"
+        >
+          CANCEL
+        </button>
+
+        <button
+          class="primary-button"
+          onclick="saveWorker()"
+        >
+          SAVE WORKER
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /* ========================================
+       DUMMY DATA
+    ======================================== */
+
+    let workers = [
+
+      {
+        id: "W001",
+        name: "Adi Susanto",
+        status: "ACTIVE",
+        team: "RED",
+        work: 18
+      },
+
+      {
+        id: "W002",
+        name: "Budi Santoso",
+        status: "ACTIVE",
+        team: "RED",
+        work: 17
+      },
+
+      {
+        id: "W003",
+        name: "Candra",
+        status: "ACTIVE",
+        team: "RED",
+        work: 17
+      },
+
+      {
+        id: "W004",
+        name: "Deni",
+        status: "ACTIVE",
+        team: "ORANGE",
+        work: 16
+      },
+
+      {
+        id: "W005",
+        name: "Fahmi",
+        status: "ACTIVE",
+        team: "YELLOW",
+        work: 15
+      },
+
+      {
+        id: "W006",
+        name: "Yudi",
+        status: "ACTIVE",
+        team: "YELLOW",
+        work: 14
+      },
+
+      {
+        id: "W007",
+        name: "Iwan",
+        status: "INACTIVE",
+        team: "YELLOW",
+        work: 13
+      },
+
+      {
+        id: "W008",
+        name: "Dinda",
+        status: "ACTIVE",
+        team: "BLUE",
+        work: 12
+      },
+
+      {
+        id: "W009",
+        name: "Andi",
+        status: "ACTIVE",
+        team: "GREEN",
+        work: 11
+      },
+
+      {
+        id: "W010",
+        name: "Rian",
+        status: "ACTIVE",
+        team: "GREEN",
+        work: 10
+      }
+
+    ];
+
+
+    let editingWorkerId = null;
+
+
+    /* ========================================
+       TEAM HELPERS
+    ======================================== */
+
+    function getTeamBadgeClass(team) {
+
+      const map = {
+
+        RED: "badge-red",
+        ORANGE: "badge-orange",
+        YELLOW: "badge-yellow",
+        BLUE: "badge-blue",
+        GREEN: "badge-green"
+
+      };
+
+      return map[team] || "";
+
+    }
+
+
+    /* ========================================
+       NAVIGATION
+    ======================================== */
+
+    function openPage(pageName) {
+
+      document
+        .querySelectorAll(".page")
+        .forEach(function(page) {
+
+          page.classList.remove("active");
+
+        });
+
+
+      const target =
+        document.getElementById(
+          "page-" + pageName
+        );
+
+
+      if (target) {
+
+        target.classList.add("active");
+
+      }
+
+
+      document
+        .querySelectorAll(".menu-button")
+        .forEach(function(button) {
+
+          button.classList.remove("active");
+
+          if (
+            button.dataset.page === pageName
+          ) {
+
+            button.classList.add("active");
+
+          }
+
+        });
+
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    document
+      .querySelectorAll(".menu-button")
+      .forEach(function(button) {
+
+        button.addEventListener(
+          "click",
+          function() {
+
+            openPage(
+              button.dataset.page
+            );
+
+          }
+        );
+
+      });
+
+
+    /* ========================================
+       RENDER MASTER DATA
+    ======================================== */
+
+    function renderWorkers() {
+
+      const tbody =
+        document.getElementById(
+          "workerTableBody"
+        );
+
+
+      const search =
+        document
+          .getElementById("workerSearch")
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const team =
+        document
+          .getElementById("teamFilter")
+          .value;
+
+
+      const status =
+        document
+          .getElementById("statusFilter")
+          .value;
+
+
+      const filtered =
+        workers.filter(
+          function(worker) {
+
+            const matchesSearch =
+              !search ||
+              worker.id
+                .toLowerCase()
+                .includes(search) ||
+              worker.name
+                .toLowerCase()
+                .includes(search);
+
+
+            const matchesTeam =
+              team === "ALL" ||
+              worker.team === team;
+
+
+            const matchesStatus =
+              status === "ALL" ||
+              worker.status === status;
+
+
+            return (
+              matchesSearch &&
+              matchesTeam &&
+              matchesStatus
+            );
+
+          }
+        );
+
+
+      if (!filtered.length) {
+
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6">
+              <div class="empty">
+                Worker tidak ditemukan.
+              </div>
+            </td>
+          </tr>
+        `;
+
+        return;
+
+      }
+
+
+      tbody.innerHTML =
+        filtered
+          .map(function(worker) {
+
+            const inactive =
+              worker.status === "INACTIVE";
+
+
+            return `
+
+              <tr
+                class="${inactive ? "inactive-row" : ""}"
+              >
+
+                <td>
+                  <span class="worker-id">
+                    ${escapeHtml(worker.id)}
+                  </span>
+                </td>
+
+                <td>
+                  <span class="worker-name">
+                    ${escapeHtml(worker.name)}
+                  </span>
+                </td>
+
+                <td>
+
+                  <span
+                    class="
+                      status-badge
+                      ${
+                        worker.status === "ACTIVE"
+                          ? "status-active"
+                          : "status-inactive"
+                      }
+                    "
+                  >
+                    ${worker.status}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  <span
+                    class="
+                      team-badge
+                      ${getTeamBadgeClass(worker.team)}
+                    "
+                  >
+                    ${worker.team}
+                  </span>
+
+                </td>
+
+                <td>
+                  <strong>
+                    ${worker.work}
+                  </strong>
+                </td>
+
+                <td>
+
+                  <button
+                    class="action-small"
+                    onclick="
+                      editWorker('${worker.id}')
+                    "
+                  >
+                    EDIT
+                  </button>
+
+                </td>
+
+              </tr>
+
+            `;
+
+          })
+          .join("");
+
+    }
+
+
+    /* ========================================
+       SEARCH / FILTER
+    ======================================== */
+
+    document
+      .getElementById("workerSearch")
+      .addEventListener(
+        "input",
+        renderWorkers
+      );
+
+
+    document
+      .getElementById("teamFilter")
+      .addEventListener(
+        "change",
+        renderWorkers
+      );
+
+
+    document
+      .getElementById("statusFilter")
+      .addEventListener(
+        "change",
+        renderWorkers
+      );
+
+
+    /* ========================================
+       MODAL
+    ======================================== */
+
+    function openWorkerModal(worker = null) {
+
+      editingWorkerId =
+        worker
+          ? worker.id
+          : null;
+
+
+      document
+        .getElementById("modalTitle")
+        .textContent =
+          worker
+            ? "EDIT WORKER"
+            : "ADD WORKER";
+
+
+      document
+        .getElementById("workerIdInput")
+        .value =
+          worker
+            ? worker.id
+            : "";
+
+
+      document
+        .getElementById("workerNameInput")
+        .value =
+          worker
+            ? worker.name
+            : "";
+
+
+      document
+        .getElementById("workerStatusInput")
+        .value =
+          worker
+            ? worker.status
+            : "ACTIVE";
+
+
+      document
+        .getElementById("workerTeamInput")
+        .value =
+          worker
+            ? worker.team
+            : "RED";
+
+
+      document
+        .getElementById("workerIdInput")
+        .disabled =
+          Boolean(worker);
+
+
+      document
+        .getElementById("workerModal")
+        .classList
+        .add("show");
+
+    }
+
+
+    function closeWorkerModal() {
+
+      document
+        .getElementById("workerModal")
+        .classList
+        .remove("show");
+
+    }
+
+
+    function editWorker(id) {
+
+      const worker =
+        workers.find(
+          function(item) {
+
+            return item.id === id;
+
+          }
+        );
+
+
+      if (worker) {
+
+        openWorkerModal(worker);
+
+      }
+
+    }
+
+
+    function saveWorker() {
+
+      const id =
+        document
+          .getElementById("workerIdInput")
+          .value
+          .trim()
+          .toUpperCase();
+
+
+      const name =
+        document
+          .getElementById("workerNameInput")
+          .value
+          .trim();
+
+
+      const status =
+        document
+          .getElementById("workerStatusInput")
+          .value;
+
+
+      const team =
+        document
+          .getElementById("workerTeamInput")
+          .value;
+
+
+      if (!id || !name) {
+
+        alert(
+          "Worker ID dan Name wajib diisi."
+        );
+
+        return;
+
+      }
+
+
+      if (editingWorkerId) {
+
+        const index =
+          workers.findIndex(
+            function(item) {
+
+              return (
+                item.id ===
+                editingWorkerId
+              );
+
+            }
+          );
+
+
+        if (index !== -1) {
+
+          workers[index].name =
+            name;
+
+          workers[index].status =
+            status;
+
+          workers[index].team =
+            team;
+
+        }
+
+      } else {
+
+        const exists =
+          workers.some(
+            function(item) {
+
+              return item.id === id;
+
+            }
+          );
+
+
+        if (exists) {
+
+          alert(
+            "Worker ID sudah digunakan."
+          );
+
+          return;
+
+        }
+
+
+        workers.push({
+
+          id: id,
+          name: name,
+          status: status,
+          team: team,
+          work: 0
+
+        });
+
+      }
+
+
+      closeWorkerModal();
+
+      renderWorkers();
+
+    }
+
+
+    /* ========================================
+       ESCAPE HTML
+    ======================================== */
+
+    function escapeHtml(value) {
+
+      return String(value)
+
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    }
+
+
+    /* ========================================
+       INIT
+    ======================================== */
+
+    renderWorkers();
+
+  </script>
 
 </body>
 </html>
