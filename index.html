@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worker System</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #222;
+    }
+
+    .header {
+      background: #0b5394;
+      color: white;
+      padding: 24px 32px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .number {
+      font-size: 34px;
+      font-weight: bold;
+      color: #0b5394;
+    }
+
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #0b5394;
+      color: white;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    @media (max-width: 800px) {
+      .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>WORKER SYSTEM</h1>
+  </div>
+
+  <div class="container">
+
+    <div class="dashboard">
+
+      <div class="card">
+        <h3>TOTAL WORKER</h3>
+        <div class="number">57</div>
+      </div>
+
+      <div class="card">
+        <h3>ACTIVE</h3>
+        <div class="number">57</div>
+      </div>
+
+      <div class="card">
+        <h3>INACTIVE</h3>
+        <div class="number">0</div>
+      </div>
+
+      <div class="card">
+        <h3>TODAY</h3>
+        <div class="number">25</div>
+      </div>
+
+    </div>
+
+    <div class="actions">
+
+      <button onclick="alert('Roster Generator')">
+        GENERATE ROSTER
+      </button>
+
+      <button onclick="alert('Callsheet')">
+        CALLSHEET
+      </button>
+
+      <button onclick="alert('Master Schedule')">
+        MASTER SCHEDULE
+      </button>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
